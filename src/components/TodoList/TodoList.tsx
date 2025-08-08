@@ -1,12 +1,13 @@
 import styles from './TodoList.module.scss';
 import TodoItem from '../TodoItem/TodoItem';
-import type { Todo } from '../../lib/types';
+import type { Todo, TodoRequest } from '../../lib/types';
 
 interface TodoListProps {
 	todos: Todo[];
 	error: string;
 	isLoading: boolean;
 	handleDelete: (a: number) => void;
+	handleEdit: (a: number, b: TodoRequest) => void;
 }
 
 export default function TodoList({
@@ -14,6 +15,7 @@ export default function TodoList({
 	isLoading,
 	todos,
 	handleDelete,
+	handleEdit,
 }: TodoListProps) {
 	return (
 		<>
@@ -23,7 +25,12 @@ export default function TodoList({
 				{todos.length > 0 ? (
 					todos.map((todo) => {
 						return (
-							<TodoItem key={todo.id} todo={todo} handleDelete={handleDelete} />
+							<TodoItem
+								key={todo.id}
+								todo={todo}
+								handleDelete={handleDelete}
+								handleEdit={handleEdit}
+							/>
 						);
 					})
 				) : (

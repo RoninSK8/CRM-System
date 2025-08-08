@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
-import { getTodos, addTodoApi, deleteTodoApi } from '../api/apiTodos';
-import type { Todo } from '../lib/types';
+import {
+	getTodos,
+	addTodoApi,
+	deleteTodoApi,
+	editTodoApi,
+} from '../api/apiTodos';
+import type { Todo, TodoRequest } from '../lib/types';
 
 export default function useTodos() {
 	const [error, setError] = useState('');
@@ -57,6 +62,22 @@ export default function useTodos() {
 			setIsLoading(false);
 		}
 	}
+	async function editTodo(id: number, todoData: TodoRequest) {
+		setError('');
+		setIsLoading(true);
+		try {
+			await editTodoApi(id, todoData);
+			fetchTodos();
+		} catch (error) {
+			setIsLoading(false);
+			if (error instanceof Error) {
+				setError(error.message);
+			}
+			return;
+		} finally {
+			setIsLoading(false);
+		}
+	}
 
-	return { error, isLoading, todos, addTodo, deleteTodo };
+	return { error, isLoading, todos, addTodo, deleteTodo, editTodo };
 }

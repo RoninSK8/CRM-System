@@ -3,7 +3,7 @@ import TodoList from './components/TodoList/TodoList';
 import useTodos from './hooks/useTodos';
 
 function App() {
-	const { error, isLoading, todos, addTodo, deleteTodo } = useTodos();
+	const { error, isLoading, todos, addTodo, deleteTodo, editTodo } = useTodos();
 	return (
 		<main>
 			<div className="todo">
@@ -13,6 +13,7 @@ function App() {
 					isLoading={isLoading}
 					error={error}
 					handleDelete={deleteTodo}
+					handleEdit={editTodo}
 				/>
 			</div>
 		</main>
