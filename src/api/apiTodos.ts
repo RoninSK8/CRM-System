@@ -1,4 +1,6 @@
-export async function addTodo(title: string) {
+import type { Todo, toDoStatus } from '../lib/types';
+
+export async function postTodo(title: string) {
 	const userData = {
 		title,
 		isDone: false,
@@ -12,6 +14,19 @@ export async function addTodo(title: string) {
 	if (response.ok) {
 		return response.body;
 	} else {
-		throw new Error('Ошибка HTTP: ' + response.status);
+		throw new Error('Ошибка: ' + response.status);
+	}
+}
+export async function getTodos(status: toDoStatus = 'all') {
+	const databaseUrl = import.meta.env.VITE_DATABASE_URL;
+	const response = await fetch(`${databaseUrl}/todos?filter=${status}`, {
+		method: 'GET',
+	});
+
+	if (response.ok) {
+		const todos = await response.json();
+		return todos.data as Todo[];
+	} else {
+		throw new Error('Ошибка: ' + response.status);
 	}
 }

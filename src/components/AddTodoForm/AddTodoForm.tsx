@@ -1,10 +1,16 @@
 import { useState } from 'react';
 import styles from './AddTodoForm.module.scss';
-import { addTodo } from '../../api/apiTodos';
 
-export default function AddTodoForm() {
+interface AddTodoFormProps {
+	isLoading: boolean;
+	handleAddTodo: (a: string) => void;
+}
+
+export default function HandleAddTodoForm({
+	isLoading,
+	handleAddTodo,
+}: AddTodoFormProps) {
 	const [input, setInput] = useState('');
-	const [isLoading, setIsLoading] = useState(false);
 	const [validationErrorText, setValidationErrorText] = useState('');
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -22,18 +28,15 @@ export default function AddTodoForm() {
 			return;
 		}
 
-		setIsLoading(true);
 		try {
-			await addTodo(input);
+			await handleAddTodo(input);
 		} catch (error) {
-			setIsLoading(false);
 			console.error('Error:', error);
 			setValidationErrorText('Ошибка при добавлении задачи.');
 			return;
 		}
 
 		setInput('');
-		setIsLoading(false);
 	};
 
 	return (

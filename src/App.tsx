@@ -1,10 +1,14 @@
 import AddTodoForm from './components/AddTodoForm/AddTodoForm';
+import TodoList from './components/TodoList/TodoList';
+import useTodos from './hooks/useTodos';
 
 function App() {
+	const { error, isLoading, todos, addTodo } = useTodos();
 	return (
 		<main>
 			<div className="todo">
-				<AddTodoForm />
+				<AddTodoForm isLoading={isLoading} handleAddTodo={addTodo} />
+				<TodoList todos={todos} isLoading={isLoading} error={error} />
 			</div>
 		</main>
 	);
