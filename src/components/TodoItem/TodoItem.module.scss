@@ -1,6 +1,8 @@
+@use 'sass:color';
 .todoItem {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 1rem;
 	margin-top: 1rem;
 	background-color: white;
@@ -17,6 +19,10 @@
 	display: flex;
 	align-items: center;
 	gap: 1rem;
+	cursor: pointer;
+}
+.checkbox input {
+	cursor: pointer;
 }
 
 .editButton {
@@ -50,4 +56,38 @@
 
 .checkedTask {
 	text-decoration-line: line-through;
+	cursor: pointer;
+}
+.unCheckedTask {
+	cursor: pointer;
+}
+
+.saveChangesButton {
+	background-color: #5595fe;
+
+	&:hover {
+		background: color.adjust(#5595fe, $lightness: -6%);
+	}
+
+	&:active {
+		background: color.adjust(#5595fe, $lightness: -10%);
+	}
+}
+.cancelChangesButton {
+	background-color: #ff675a;
+	color: #ffffff;
+	&:hover {
+		background: color.adjust(#ff675a, $lightness: -6%);
+	}
+
+	&:active {
+		background: color.adjust(#ff675a, $lightness: -10%);
+	}
+}
+
+.error {
+	color: red;
+	display: block;
+	text-align: center;
+	margin: 1rem;
 }
