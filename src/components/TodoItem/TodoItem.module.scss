@@ -1,7 +1,7 @@
 .todoItem {
 	display: flex;
 	align-items: center;
-	gap: 0.5rem;
+	gap: 1rem;
 	margin-top: 1rem;
 	background-color: white;
 	box-sizing: border-box;
@@ -16,5 +16,34 @@
 .checkbox {
 	display: flex;
 	align-items: center;
-	gap: 0.5rem;
+	gap: 1rem;
+}
+
+.editButton {
+	padding: 0;
+	margin: 0;
+	background-color: white;
+	margin-left: auto;
+
+	&:hover {
+		background-color: white;
+	}
+
+	&:active {
+		background-color: white;
+	}
+}
+
+.deleteButton {
+	padding: 0;
+	margin: 0;
+	background-color: white;
+
+	&:hover {
+		background-color: white;
+	}
+
+	&:active {
+		background-color: white;
+	}
 }

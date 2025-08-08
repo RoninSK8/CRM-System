@@ -3,12 +3,17 @@ import TodoList from './components/TodoList/TodoList';
 import useTodos from './hooks/useTodos';
 
 function App() {
-	const { error, isLoading, todos, addTodo } = useTodos();
+	const { error, isLoading, todos, addTodo, deleteTodo } = useTodos();
 	return (
 		<main>
 			<div className="todo">
 				<AddTodoForm isLoading={isLoading} handleAddTodo={addTodo} />
-				<TodoList todos={todos} isLoading={isLoading} error={error} />
+				<TodoList
+					todos={todos}
+					isLoading={isLoading}
+					error={error}
+					handleDelete={deleteTodo}
+				/>
 			</div>
 		</main>
 	);

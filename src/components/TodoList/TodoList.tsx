@@ -6,15 +6,15 @@ interface TodoListProps {
 	todos: Todo[];
 	error: string;
 	isLoading: boolean;
+	handleDelete: (a: number) => void;
 }
 
-export default function TodoList({ error, isLoading, todos }: TodoListProps) {
-	// if (isLoading) {
-	// 	return <div>Загррузка...</div>;
-	// }
-	// if (error.length > 0) {
-	// 	return <div>Ошибка загрузки данных...</div>;
-	// }
+export default function TodoList({
+	error,
+	isLoading,
+	todos,
+	handleDelete,
+}: TodoListProps) {
 	return (
 		<>
 			{isLoading && <p>Загррузка...</p>}
@@ -22,7 +22,9 @@ export default function TodoList({ error, isLoading, todos }: TodoListProps) {
 			<div className={styles.toDoList}>
 				{todos.length > 0 ? (
 					todos.map((todo) => {
-						return <TodoItem key={todo.id} todo={todo} />;
+						return (
+							<TodoItem key={todo.id} todo={todo} handleDelete={handleDelete} />
+						);
 					})
 				) : (
 					<p>Список задач пуст...</p>

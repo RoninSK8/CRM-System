@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getTodos, postTodo } from '../api/apiTodos';
+import { getTodos, addTodoApi, deleteTodoApi } from '../api/apiTodos';
 import type { Todo } from '../lib/types';
 
 export default function useTodos() {
@@ -29,7 +29,23 @@ export default function useTodos() {
 		setError('');
 		setIsLoading(true);
 		try {
-			await postTodo(title);
+			await addTodoApi(title);
+			fetchTodos();
+		} catch (error) {
+			setIsLoading(false);
+			if (error instanceof Error) {
+				setError(error.message);
+			}
+			return;
+		} finally {
+			setIsLoading(false);
+		}
+	}
+	async function deleteTodo(id: number) {
+		setError('');
+		setIsLoading(true);
+		try {
+			await deleteTodoApi(id);
 			fetchTodos();
 		} catch (error) {
 			setIsLoading(false);
@@ -42,5 +58,5 @@ export default function useTodos() {
 		}
 	}
 
-	return { error, isLoading, todos, addTodo };
+	return { error, isLoading, todos, addTodo, deleteTodo };
 }
