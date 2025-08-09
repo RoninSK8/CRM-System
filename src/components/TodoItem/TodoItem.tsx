@@ -1,6 +1,8 @@
 import styles from './TodoItem.module.scss';
 import type { Todo, TodoRequest } from '../../lib/types';
 import { useState } from 'react';
+import editIcon from '@/assets/icons/edit.svg';
+import deleteIcon from '@/assets/icons/trash.svg';
 
 interface TodoItemProps {
 	todo: Todo;
@@ -103,24 +105,14 @@ export default function TodoItem({
 						onClick={() => setIsEditing(!isEditing)}
 						className={styles.editButton}
 					>
-						<img
-							src="/src/assets/icons/edit.svg"
-							width="24"
-							height="24"
-							alt="редактировать"
-						/>
+						<img src={editIcon} width="24" height="24" alt="редактировать" />
 					</button>
 				)}
 				<button
 					onClick={() => handleDelete(todo.id)}
 					className={styles.deleteButton}
 				>
-					<img
-						src="/src/assets/icons/trash.svg"
-						width="24"
-						height="24"
-						alt="удалить"
-					/>
+					<img src={deleteIcon} width="24" height="24" alt="удалить" />
 				</button>
 			</div>
 			{validationErrorText.length > 0 ? (
