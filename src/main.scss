@@ -17,12 +17,11 @@ $primary-red: #ff675a;
 	justify-content: center;
 	align-items: center;
 	position: absolute;
-	// left: 50%;
-	top: 20%;
+	left: 50%;
+	top: 15%;
 	width: calc(100vw - 60px);
 	max-width: 1050px;
-	// height: calc(100vh - 140px);
-	// transform: translate(-50%, -50%);
+	transform: translateX(-50%);
 	font-size: 14px;
 }
 

@@ -1,8 +1,8 @@
 import styles from './TodoItem.module.scss';
 import type { Todo, TodoRequest } from '../../lib/types';
 import { useState } from 'react';
-import editIcon from '@/assets/icons/edit.svg';
-import deleteIcon from '@/assets/icons/trash.svg';
+import editIcon from '/src/assets/icons/edit.svg';
+import deleteIcon from '/src/assets/icons/trash.svg';
 
 interface TodoItemProps {
 	todo: Todo;
