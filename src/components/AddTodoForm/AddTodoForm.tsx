@@ -15,16 +15,16 @@ export default function HandleAddTodoForm({
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		if (!input.trim()) {
+			setValidationErrorText('Это поле не может быть пустым');
+			return;
+		}
 		if (input.trim().length < 2) {
 			setValidationErrorText('Минимальная длина текста 2 символа');
 			return;
 		}
 		if (input.trim().length > 64) {
 			setValidationErrorText('Максимальная длина текста 64 символа');
-			return;
-		}
-		if (!input.trim()) {
-			setValidationErrorText('Это поле не может быть пустым');
 			return;
 		}
 

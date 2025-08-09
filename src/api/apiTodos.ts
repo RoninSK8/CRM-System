@@ -1,4 +1,4 @@
-import type { Todo, TodoRequest, toDoStatus } from '../lib/types';
+import type { Todo, TodoInfo, TodoRequest, toDoStatus } from '../lib/types';
 
 export async function addTodoApi(title: string) {
 	const userData = {
@@ -26,6 +26,19 @@ export async function getTodos(status: toDoStatus = 'all') {
 	if (response.ok) {
 		const todos = await response.json();
 		return todos.data as Todo[];
+	} else {
+		throw new Error('Ошибка: ' + response.status);
+	}
+}
+export async function getTodosInfo(status: toDoStatus = 'all') {
+	const databaseUrl = import.meta.env.VITE_DATABASE_URL;
+	const response = await fetch(`${databaseUrl}/todos?filter=${status}`, {
+		method: 'GET',
+	});
+
+	if (response.ok) {
+		const todos = await response.json();
+		return todos.info as TodoInfo;
 	} else {
 		throw new Error('Ошибка: ' + response.status);
 	}

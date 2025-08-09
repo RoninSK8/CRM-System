@@ -19,7 +19,6 @@ export default function TodoList({
 }: TodoListProps) {
 	return (
 		<>
-			{isLoading && <p>Загррузка...</p>}
 			{error.length > 0 ? <p>Ошибка загрузки данных...</p> : null}
 			<div className={styles.toDoList}>
 				{todos.length > 0 ? (
@@ -37,6 +36,7 @@ export default function TodoList({
 					<p>Список задач пуст...</p>
 				)}
 			</div>
+			{isLoading && <p>Загрузка...</p>}
 		</>
 	);
 }

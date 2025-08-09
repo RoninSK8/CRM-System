@@ -10,3 +10,8 @@ export interface Todo {
 	created: string; // ISO date string
 	isDone: boolean;
 }
+export interface TodoInfo {
+	all: number;
+	completed: number;
+	inWork: number;
+}
