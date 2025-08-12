@@ -1,63 +1,64 @@
 import { useState } from 'react';
 import styles from './AddTodoForm.module.scss';
+import { addTodoApi } from '../../api/apiTodos';
+import validate from '../../utils/validate';
 
 interface AddTodoFormProps {
 	isLoading: boolean;
-	handleAddTodo: (a: string) => void;
+	fetchTodos: () => void;
+	setIsLoading: (arg: boolean) => void;
 }
 
 export default function HandleAddTodoForm({
 	isLoading,
-	handleAddTodo,
+	fetchTodos,
+	setIsLoading,
 }: AddTodoFormProps) {
-	const [input, setInput] = useState('');
-	const [validationErrorText, setValidationErrorText] = useState('');
+	const [todoTitle, setTodoTitle] = useState('');
+	const [errorText, setErrorText] = useState('');
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		if (!input.trim()) {
-			setValidationErrorText('Это поле не может быть пустым');
-			return;
-		}
-		if (input.trim().length < 2) {
-			setValidationErrorText('Минимальная длина текста 2 символа');
-			return;
-		}
-		if (input.trim().length > 64) {
-			setValidationErrorText('Максимальная длина текста 64 символа');
+		const trimmedTodoTitle = todoTitle.trim();
+
+		if (validate(trimmedTodoTitle)) {
+			setErrorText(validate(trimmedTodoTitle));
 			return;
 		}
 
+		setErrorText('');
+		setIsLoading(true);
 		try {
-			await handleAddTodo(input);
+			await addTodoApi(trimmedTodoTitle);
+			fetchTodos();
 		} catch (error) {
 			console.error('Error:', error);
-			setValidationErrorText('Ошибка при добавлении задачи.');
-			return;
+			setErrorText('Ошибка при добавлении задачи.');
+		} finally {
+			setIsLoading(false);
+			setTodoTitle('');
 		}
-
-		setInput('');
 	};
+
+	function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+		setTodoTitle(e.target.value);
+		setErrorText('');
+	}
 
 	return (
 		<>
-			<form className={styles.form} onSubmit={handleSubmit}>
+			<form className={styles.form} onSubmit={onSubmit}>
 				<input
 					className={styles.input}
-					value={input}
-					onChange={(e) => {
-						setInput(e.target.value);
-						setValidationErrorText('');
-					}}
+					value={todoTitle}
+					onChange={handleInputChange}
 					placeholder="Введите текст задачи..."
 				/>
 				<button disabled={isLoading} className={styles.button}>
 					Создать
 				</button>
 			</form>
-			{validationErrorText.length > 0 ? (
-				<span className={styles.error}>{validationErrorText}</span>
-			) : null}
+			{errorText && <span className={styles.error}>{errorText}</span>}
 		</>
 	);
 }

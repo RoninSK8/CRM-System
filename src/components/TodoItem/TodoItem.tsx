@@ -1,61 +1,66 @@
 import styles from './TodoItem.module.scss';
-import type { Todo, TodoRequest } from '../../lib/types';
 import { useState } from 'react';
 import editIcon from '/src/assets/icons/edit.svg';
 import deleteIcon from '/src/assets/icons/trash.svg';
+import type { Todo, TodoRequest } from '../../types/todo';
+import validate from '../../utils/validate';
 
 interface TodoItemProps {
 	todo: Todo;
-	handleDelete: (a: number) => void;
-	handleEdit: (a: number, b: TodoRequest) => void;
+	onDelete: (a: number) => void;
+	onEdit: (a: number, b: TodoRequest) => void;
 }
 
-export default function TodoItem({
-	todo,
-	handleDelete,
-	handleEdit,
-}: TodoItemProps) {
+export default function TodoItem({ todo, onDelete, onEdit }: TodoItemProps) {
 	const [isEditing, setIsEditing] = useState(false);
-	const [input, setInput] = useState(todo.title);
-	const [validationErrorText, setValidationErrorText] = useState('');
+	const [todoTitle, setTodoTitle] = useState(todo.title);
+	const [errorText, setErrorText] = useState('');
+
 	function onChangeStatus(isChecked: boolean) {
 		const newTodoData = {
-			title: todo.title,
 			isDone: isChecked,
 		};
-		handleEdit(todo.id, newTodoData);
+		onEdit(todo.id, newTodoData);
 	}
+
 	const handleSubmitTitleChange = async (
 		e: React.FormEvent<HTMLFormElement>
 	) => {
 		e.preventDefault();
-		if (!input.trim()) {
-			setValidationErrorText('Это поле не может быть пустым');
-			return;
-		}
-		if (input.trim().length < 2) {
-			setValidationErrorText('Минимальная длина текста 2 символа');
-			return;
-		}
-		if (input.trim().length > 64) {
-			setValidationErrorText('Максимальная длина текста 64 символа');
+		const trimmedTodoTitle = todoTitle.trim();
+
+		if (validate(trimmedTodoTitle)) {
+			setErrorText(validate(trimmedTodoTitle));
 			return;
 		}
 
 		try {
 			const newTodoData = {
-				title: input,
-				isDone: todo.isDone,
+				title: trimmedTodoTitle,
 			};
-			await handleEdit(todo.id, newTodoData);
+			await onEdit(todo.id, newTodoData);
 		} catch (error) {
 			console.error('Error:', error);
-			setValidationErrorText('Ошибка при добавлении задачи.');
+			setErrorText('Ошибка при добавлении задачи.');
 			return;
 		}
 		setIsEditing(false);
-		// setInput('');
 	};
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setTodoTitle(e.target.value);
+		setErrorText('');
+	};
+
+	const handleCancelEditClick = (
+		e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+	) => {
+		e.preventDefault();
+		setIsEditing(false);
+		setErrorText('');
+		setTodoTitle(todo.title);
+	};
+
 	return (
 		<>
 			<div className={styles.todoItem}>
@@ -70,21 +75,14 @@ export default function TodoItem({
 							<form className={styles.form} onSubmit={handleSubmitTitleChange}>
 								<input
 									className={styles.input}
-									value={input}
-									onChange={(e) => {
-										setInput(e.target.value);
-										setValidationErrorText('');
-									}}
+									value={todoTitle}
+									onChange={handleInputChange}
 									placeholder="Введите текст задачи..."
 								/>
 								<button className={styles.saveChangesButton}>Сохранить</button>
 							</form>
 							<button
-								onClick={(e) => {
-									e.preventDefault();
-									setIsEditing(false);
-									setValidationErrorText('');
-								}}
+								onClick={handleCancelEditClick}
 								className={styles.cancelChangesButton}
 							>
 								Отмена
@@ -109,15 +107,13 @@ export default function TodoItem({
 					</button>
 				)}
 				<button
-					onClick={() => handleDelete(todo.id)}
+					onClick={() => onDelete(todo.id)}
 					className={styles.deleteButton}
 				>
 					<img src={deleteIcon} width="24" height="24" alt="удалить" />
 				</button>
 			</div>
-			{validationErrorText.length > 0 ? (
-				<span className={styles.error}>{validationErrorText}</span>
-			) : null}
+			{errorText && <span className={styles.error}>{errorText}</span>}
 		</>
 	);
 }

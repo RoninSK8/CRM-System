@@ -1,6 +1,12 @@
-import type { Todo, TodoInfo, TodoRequest, toDoStatus } from '../lib/types';
+import type {
+	MetaResponse,
+	Todo,
+	TodoInfo,
+	TodoRequest,
+	ToDoStatus,
+} from '../types/todo';
 
-export async function addTodoApi(title: string) {
+export async function addTodoApi(title: string): Promise<Todo> {
 	const userData = {
 		title,
 		isDone: false,
@@ -12,50 +18,45 @@ export async function addTodoApi(title: string) {
 	});
 
 	if (response.ok) {
-		return response.body;
+		const data: Todo = await response.json();
+		return data;
 	} else {
 		throw new Error('Ошибка: ' + response.status);
 	}
 }
-export async function getTodos(status: toDoStatus = 'all') {
+export async function getTodos(
+	status: ToDoStatus = 'all'
+): Promise<MetaResponse<Todo, TodoInfo>> {
 	const databaseUrl = import.meta.env.VITE_DATABASE_URL;
 	const response = await fetch(`${databaseUrl}/todos?filter=${status}`, {
 		method: 'GET',
 	});
 
 	if (response.ok) {
-		const todos = await response.json();
-		return todos.data as Todo[];
+		const data: MetaResponse<Todo, TodoInfo> = await response.json();
+		return data;
 	} else {
 		throw new Error('Ошибка: ' + response.status);
 	}
 }
-export async function getTodosInfo(status: toDoStatus = 'all') {
-	const databaseUrl = import.meta.env.VITE_DATABASE_URL;
-	const response = await fetch(`${databaseUrl}/todos?filter=${status}`, {
-		method: 'GET',
-	});
 
-	if (response.ok) {
-		const todos = await response.json();
-		return todos.info as TodoInfo;
-	} else {
-		throw new Error('Ошибка: ' + response.status);
-	}
-}
-export async function deleteTodoApi(id: number) {
+export async function deleteTodoApi(id: number): Promise<string> {
 	const databaseUrl = import.meta.env.VITE_DATABASE_URL;
 	const response = await fetch(`${databaseUrl}/todos/${id}`, {
 		method: 'DELETE',
 	});
 
 	if (response.ok) {
-		return response.body;
+		const data: string = await response.text();
+		return data;
 	} else {
 		throw new Error('Ошибка: ' + response.status);
 	}
 }
-export async function editTodoApi(id: number, todoData: TodoRequest) {
+export async function editTodoApi(
+	id: number,
+	todoData: TodoRequest
+): Promise<Todo> {
 	const databaseUrl = import.meta.env.VITE_DATABASE_URL;
 	const response = await fetch(`${databaseUrl}/todos/${id}`, {
 		method: 'PUT',
@@ -63,7 +64,8 @@ export async function editTodoApi(id: number, todoData: TodoRequest) {
 	});
 
 	if (response.ok) {
-		return response.body;
+		const data: Todo = await response.json();
+		return data;
 	} else {
 		throw new Error('Ошибка: ' + response.status);
 	}

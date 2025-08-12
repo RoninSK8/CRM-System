@@ -1,9 +1,9 @@
-import type { TodoInfo, toDoStatus } from '../../lib/types';
+import type { TodoInfo, ToDoStatus } from '../../types/todo';
 import styles from './FilterTabList.module.scss';
 
 type FilterTabListProps = {
-	filter: toDoStatus;
-	setFilter: (arg: toDoStatus) => void;
+	filter: ToDoStatus;
+	setFilter: (arg: ToDoStatus) => void;
 	todoInfo: TodoInfo;
 };
 
@@ -14,7 +14,7 @@ export default function FilterTabList({
 }: FilterTabListProps) {
 	const handleClick = (
 		e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-		status: toDoStatus
+		status: ToDoStatus
 	) => {
 		e.preventDefault();
 		setFilter(status);
