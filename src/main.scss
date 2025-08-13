@@ -24,30 +24,3 @@ $primary-red: #ff675a;
 	transform: translateX(-50%);
 	font-size: 14px;
 }
-
-button {
-	background: $primary-blue;
-	border-radius: 4px;
-	color: #ffffff;
-	border: 0;
-	padding: 10px 20px;
-	cursor: pointer;
-
-	&:hover {
-		background: color.adjust($primary-blue, $lightness: -6%);
-	}
-
-	&:active {
-		background: color.adjust($primary-blue, $lightness: -10%);
-	}
-}
-
-form {
-	box-sizing: border-box;
-	padding: 8px 12px;
-	width: 100%;
-
-	&:focus {
-		border-color: #dbdbdb;
-	}
-}

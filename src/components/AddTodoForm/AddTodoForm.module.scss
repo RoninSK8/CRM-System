@@ -1,8 +1,16 @@
-form {
+.form {
 	display: flex;
 	flex-direction: row;
 	gap: 10px;
-	max-width: 600px;
+	max-width: 800px;
+
+	box-sizing: border-box;
+	padding: 8px 12px;
+	width: 100%;
+
+	&:focus {
+		border-color: #dbdbdb;
+	}
 }
 input {
 	flex-grow: 1;

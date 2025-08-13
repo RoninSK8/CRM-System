@@ -46,21 +46,6 @@ export function TodosPage() {
 		fetchTodos();
 	}, [filter, fetchTodos]);
 
-	// async function addTodo(title: string) {
-	// 	setError('');
-	// 	setIsLoading(true);
-	// 	try {
-	// 		await addTodoApi(title);
-	// 		fetchTodos();
-	// 	} catch (error) {
-	// 		if (error instanceof Error) {
-	// 			setError(error.message);
-	// 		}
-	// 	} finally {
-	// 		setIsLoading(false);
-	// 	}
-	// }
-
 	async function deleteTodo(id: number) {
 		setError('');
 		setIsLoading(true);

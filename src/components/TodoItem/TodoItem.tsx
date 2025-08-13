@@ -1,9 +1,8 @@
 import styles from './TodoItem.module.scss';
 import { useState } from 'react';
-import editIcon from '/src/assets/icons/edit.svg';
-import deleteIcon from '/src/assets/icons/trash.svg';
 import type { Todo, TodoRequest } from '../../types/todo';
 import validate from '../../utils/validate';
+import Button from '../../ui/Button/Button';
 
 interface TodoItemProps {
 	todo: Todo;
@@ -71,23 +70,16 @@ export default function TodoItem({ todo, onDelete, onEdit }: TodoItemProps) {
 						onChange={(e) => onChangeStatus(e.target.checked)}
 					/>
 					{isEditing ? (
-						<>
-							<form className={styles.form} onSubmit={handleSubmitTitleChange}>
-								<input
-									className={styles.input}
-									value={todoTitle}
-									onChange={handleInputChange}
-									placeholder="Введите текст задачи..."
-								/>
-								<button className={styles.saveChangesButton}>Сохранить</button>
-							</form>
-							<button
-								onClick={handleCancelEditClick}
-								className={styles.cancelChangesButton}
-							>
-								Отмена
-							</button>
-						</>
+						<form className={styles.form} onSubmit={handleSubmitTitleChange}>
+							<input
+								className={styles.input}
+								value={todoTitle}
+								onChange={handleInputChange}
+								placeholder="Введите текст задачи..."
+							/>
+
+							<Button>Сохранить</Button>
+						</form>
 					) : (
 						<span
 							className={
@@ -98,20 +90,37 @@ export default function TodoItem({ todo, onDelete, onEdit }: TodoItemProps) {
 						</span>
 					)}
 				</label>
-				{!isEditing && (
-					<button
-						onClick={() => setIsEditing(!isEditing)}
-						className={styles.editButton}
-					>
-						<img src={editIcon} width="24" height="24" alt="редактировать" />
-					</button>
-				)}
-				<button
-					onClick={() => onDelete(todo.id)}
-					className={styles.deleteButton}
+				<div
+					style={{
+						display: 'flex',
+						justifyContent: 'space-between',
+						gap: '20px',
+						backgroundColor: 'white',
+					}}
 				>
-					<img src={deleteIcon} width="24" height="24" alt="удалить" />
-				</button>
+					{isEditing ? (
+						<Button
+							onClick={handleCancelEditClick}
+							className={styles.cancelChangesButton}
+							colorVariant="secondary"
+						>
+							Отмена
+						</Button>
+					) : (
+						<Button
+							onClick={() => setIsEditing(!isEditing)}
+							className={styles.editButton}
+							icon="edit"
+						></Button>
+					)}
+
+					<Button
+						onClick={() => onDelete(todo.id)}
+						colorVariant="danger"
+						className={styles.deleteButton}
+						icon="trash"
+					></Button>
+				</div>
 			</div>
 			{errorText && <span className={styles.error}>{errorText}</span>}
 		</>

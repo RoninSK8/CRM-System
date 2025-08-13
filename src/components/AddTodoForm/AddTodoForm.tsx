@@ -2,6 +2,7 @@ import { useState } from 'react';
 import styles from './AddTodoForm.module.scss';
 import { addTodoApi } from '../../api/apiTodos';
 import validate from '../../utils/validate';
+import Button from '../../ui/Button/Button';
 
 interface AddTodoFormProps {
 	isLoading: boolean;
@@ -54,9 +55,13 @@ export default function HandleAddTodoForm({
 					onChange={handleInputChange}
 					placeholder="Введите текст задачи..."
 				/>
-				<button disabled={isLoading} className={styles.button}>
+				{/* <button disabled={isLoading} className={styles.button}>
 					Создать
-				</button>
+				</button> */}
+
+				<Button disabled={isLoading} className={styles.button}>
+					Создать
+				</Button>
 			</form>
 			{errorText && <span className={styles.error}>{errorText}</span>}
 		</>

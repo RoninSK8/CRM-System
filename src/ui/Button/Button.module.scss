@@ -1,0 +1,41 @@
+@use 'sass:color';
+$primary: #5595fe;
+$secondary: #6c757d;
+$danger: #ff675a;
+
+.button {
+	border-radius: 4px;
+	color: #ffffff;
+	border: none;
+	padding: 0.8em 1.5em;
+	cursor: pointer;
+	transition: all 0.2s;
+	height: 46px;
+}
+
+@mixin solid-color($bg-color) {
+	background-color: $bg-color;
+
+	&:hover {
+		background: color.adjust($bg-color, $lightness: -6%);
+	}
+	&:active {
+		background: color.adjust($bg-color, $lightness: -10%);
+	}
+}
+
+.primary {
+	@include solid-color($primary);
+}
+
+.secondary {
+	@include solid-color($secondary);
+}
+
+.danger {
+	@include solid-color($danger);
+}
+
+.icon {
+	background-color: inherit;
+}
