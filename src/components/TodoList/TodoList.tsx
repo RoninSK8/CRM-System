@@ -1,21 +1,21 @@
 import styles from './TodoList.module.scss';
 import TodoItem from '../TodoItem/TodoItem';
-import type { Todo, TodoRequest } from '../../types/todo';
+import type { Todo } from '../../types/todo';
 
 interface TodoListProps {
 	todos: Todo[];
 	error: string;
+	fetchTodos: () => void;
 	isLoading: boolean;
-	onDelete: (a: number) => void;
-	onEdit: (a: number, b: TodoRequest) => void;
+	setIsLoading: (arg: boolean) => void;
 }
 
 export default function TodoList({
 	error,
 	isLoading,
 	todos,
-	onDelete,
-	onEdit,
+	fetchTodos,
+	setIsLoading,
 }: TodoListProps) {
 	return (
 		<>
@@ -27,8 +27,9 @@ export default function TodoList({
 							<TodoItem
 								key={todo.id}
 								todo={todo}
-								onDelete={onDelete}
-								onEdit={onEdit}
+								fetchTodos={fetchTodos}
+								isLoading={isLoading}
+								setIsLoading={setIsLoading}
 							/>
 						);
 					})

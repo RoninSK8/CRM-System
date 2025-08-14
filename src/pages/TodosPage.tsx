@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { Todo, TodoInfo, TodoRequest, ToDoStatus } from '../types/todo';
-import {
-	// addTodoApi,
-	deleteTodoApi,
-	editTodoApi,
-	getTodos,
-} from '../api/apiTodos';
+import type { Todo, TodoInfo, ToDoStatus } from '../types/todo';
+import { getTodos } from '../api/apiTodos';
 import AddTodoForm from '../components/AddTodoForm/AddTodoForm';
 import FilterTabList from '../components/FilterTabList/FilterTabList';
 import TodoList from '../components/TodoList/TodoList';
@@ -24,15 +19,15 @@ export function TodosPage() {
 	const fetchTodos = useCallback(async () => {
 		setIsLoading(true);
 		try {
-			const todosResponse = await getTodos(filter);
-			const todos = todosResponse.data;
-			const todoInfo = todosResponse.info;
-			if (!todoInfo) {
-				setError('Ошибка при загрузке данных о количестве задач');
+			const { data, info } = await getTodos(filter);
+
+			if (info) {
+				setTodoInfo(info);
 			} else {
-				setTodoInfo(todoInfo);
+				setError('Ошибка при загрузке данных о количестве задач');
 			}
-			setTodos(todos);
+
+			setTodos(data);
 		} catch (error) {
 			if (error instanceof Error) {
 				setError(error.message);
@@ -45,36 +40,6 @@ export function TodosPage() {
 	useEffect(() => {
 		fetchTodos();
 	}, [filter, fetchTodos]);
-
-	async function deleteTodo(id: number) {
-		setError('');
-		setIsLoading(true);
-		try {
-			await deleteTodoApi(id);
-			await fetchTodos();
-		} catch (error) {
-			if (error instanceof Error) {
-				console.log(error);
-				setError(error.message);
-			}
-		} finally {
-			setIsLoading(false);
-		}
-	}
-	async function editTodo(id: number, todoData: TodoRequest) {
-		setError('');
-		setIsLoading(true);
-		try {
-			await editTodoApi(id, todoData);
-			fetchTodos();
-		} catch (error) {
-			if (error instanceof Error) {
-				setError(error.message);
-			}
-		} finally {
-			setIsLoading(false);
-		}
-	}
 
 	return (
 		<main>
@@ -91,10 +56,10 @@ export function TodosPage() {
 				/>
 				<TodoList
 					todos={todos}
-					isLoading={isLoading}
 					error={error}
-					onDelete={deleteTodo}
-					onEdit={editTodo}
+					fetchTodos={fetchTodos}
+					isLoading={isLoading}
+					setIsLoading={setIsLoading}
 				/>
 			</div>
 		</main>

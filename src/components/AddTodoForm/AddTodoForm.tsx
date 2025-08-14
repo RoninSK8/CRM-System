@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './AddTodoForm.module.scss';
 import { addTodoApi } from '../../api/apiTodos';
-import validate from '../../utils/validate';
+import validateTodoTitle from '../../utils/validate';
 import Button from '../../ui/Button/Button';
 
 interface AddTodoFormProps {
@@ -22,8 +22,8 @@ export default function HandleAddTodoForm({
 		e.preventDefault();
 		const trimmedTodoTitle = todoTitle.trim();
 
-		if (validate(trimmedTodoTitle)) {
-			setErrorText(validate(trimmedTodoTitle));
+		if (validateTodoTitle(trimmedTodoTitle)) {
+			setErrorText(validateTodoTitle(trimmedTodoTitle));
 			return;
 		}
 
@@ -32,12 +32,12 @@ export default function HandleAddTodoForm({
 		try {
 			await addTodoApi(trimmedTodoTitle);
 			fetchTodos();
+			setTodoTitle('');
 		} catch (error) {
 			console.error('Error:', error);
 			setErrorText('Ошибка при добавлении задачи.');
 		} finally {
 			setIsLoading(false);
-			setTodoTitle('');
 		}
 	};
 
@@ -55,10 +55,6 @@ export default function HandleAddTodoForm({
 					onChange={handleInputChange}
 					placeholder="Введите текст задачи..."
 				/>
-				{/* <button disabled={isLoading} className={styles.button}>
-					Создать
-				</button> */}
-
 				<Button disabled={isLoading} className={styles.button}>
 					Создать
 				</Button>

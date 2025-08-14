@@ -1,4 +1,4 @@
-export default function validate(toDoTitle: string): string {
+export default function validateTodoTitle(toDoTitle: string): string {
 	if (!toDoTitle.trim()) {
 		return 'Это поле не может быть пустым';
 	}

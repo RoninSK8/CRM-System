@@ -1,19 +1,58 @@
 import styles from './TodoItem.module.scss';
 import { useState } from 'react';
 import type { Todo, TodoRequest } from '../../types/todo';
-import validate from '../../utils/validate';
+import validateTodoTitle from '../../utils/validate';
 import Button from '../../ui/Button/Button';
+import { deleteTodoApi, editTodoApi } from '../../api/apiTodos';
+import IconButton from '../../ui/IconButton/IconButton';
 
 interface TodoItemProps {
 	todo: Todo;
-	onDelete: (a: number) => void;
-	onEdit: (a: number, b: TodoRequest) => void;
+	isLoading: boolean;
+	setIsLoading: (arg: boolean) => void;
+	fetchTodos: () => void;
 }
 
-export default function TodoItem({ todo, onDelete, onEdit }: TodoItemProps) {
+export default function TodoItem({
+	todo,
+	isLoading,
+	setIsLoading,
+	fetchTodos,
+}: TodoItemProps) {
 	const [isEditing, setIsEditing] = useState(false);
 	const [todoTitle, setTodoTitle] = useState(todo.title);
 	const [errorText, setErrorText] = useState('');
+
+	async function onDelete(id: number) {
+		setErrorText('');
+		setIsLoading(true);
+		try {
+			await deleteTodoApi(id);
+			await fetchTodos();
+		} catch (error) {
+			if (error instanceof Error) {
+				console.log(error);
+				setErrorText(error.message);
+			}
+		} finally {
+			setIsLoading(false);
+		}
+	}
+
+	async function onEdit(id: number, todoData: TodoRequest) {
+		setErrorText('');
+		setIsLoading(true);
+		try {
+			await editTodoApi(id, todoData);
+			fetchTodos();
+		} catch (error) {
+			if (error instanceof Error) {
+				setErrorText(error.message);
+			}
+		} finally {
+			setIsLoading(false);
+		}
+	}
 
 	function onChangeStatus(isChecked: boolean) {
 		const newTodoData = {
@@ -28,8 +67,8 @@ export default function TodoItem({ todo, onDelete, onEdit }: TodoItemProps) {
 		e.preventDefault();
 		const trimmedTodoTitle = todoTitle.trim();
 
-		if (validate(trimmedTodoTitle)) {
-			setErrorText(validate(trimmedTodoTitle));
+		if (validateTodoTitle(trimmedTodoTitle)) {
+			setErrorText(validateTodoTitle(trimmedTodoTitle));
 			return;
 		}
 
@@ -78,7 +117,7 @@ export default function TodoItem({ todo, onDelete, onEdit }: TodoItemProps) {
 								placeholder="Введите текст задачи..."
 							/>
 
-							<Button>Сохранить</Button>
+							<Button disabled={isLoading}>Сохранить</Button>
 						</form>
 					) : (
 						<span
@@ -107,19 +146,35 @@ export default function TodoItem({ todo, onDelete, onEdit }: TodoItemProps) {
 							Отмена
 						</Button>
 					) : (
-						<Button
+						<IconButton
 							onClick={() => setIsEditing(!isEditing)}
 							className={styles.editButton}
-							icon="edit"
-						></Button>
+							icon={
+								<img
+									src={'/icons/edit.svg'}
+									className={styles.icon}
+									width="24"
+									height="24"
+									alt="edit icon"
+								></img>
+							}
+						></IconButton>
 					)}
 
-					<Button
+					<IconButton
 						onClick={() => onDelete(todo.id)}
 						colorVariant="danger"
 						className={styles.deleteButton}
-						icon="trash"
-					></Button>
+						icon={
+							<img
+								src={'/icons/trash.svg'}
+								className={styles.icon}
+								width="24"
+								height="24"
+								alt="delete icon"
+							></img>
+						}
+					></IconButton>
 				</div>
 			</div>
 			{errorText && <span className={styles.error}>{errorText}</span>}
