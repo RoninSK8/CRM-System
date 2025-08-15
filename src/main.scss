@@ -1,0 +1,26 @@
+@use 'sass:color';
+* {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	outline: none;
+	font-family: 'Roboto', -apple-system, system-ui, sans-serif;
+	background-color: #f1f4f9;
+}
+
+$primary-blue: #5595fe;
+$primary-red: #ff675a;
+
+.todo {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	left: 50%;
+	top: 15%;
+	width: calc(100vw - 60px);
+	max-width: 1050px;
+	transform: translateX(-50%);
+	font-size: 14px;
+}
