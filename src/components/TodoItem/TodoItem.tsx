@@ -1,10 +1,9 @@
 import styles from './TodoItem.module.scss';
 import { useState } from 'react';
 import type { Todo, TodoRequest } from '../../types/todo';
-import validateTodoTitle from '../../utils/validate';
-import Button from '../../ui/Button/Button';
 import { deleteTodoApi, editTodoApi } from '../../api/apiTodos';
-import IconButton from '../../ui/IconButton/IconButton';
+import { Button, Checkbox, Form, Input } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 interface TodoItemProps {
 	todo: Todo;
@@ -19,9 +18,9 @@ export default function TodoItem({
 	setIsLoading,
 	fetchTodos,
 }: TodoItemProps) {
-	const [isEditing, setIsEditing] = useState(false);
-	const [todoTitle, setTodoTitle] = useState(todo.title);
-	const [errorText, setErrorText] = useState('');
+	const [isEditing, setIsEditing] = useState<boolean>(false);
+	const [errorText, setErrorText] = useState<string>('');
+	const [form] = Form.useForm();
 
 	async function onDelete(id: number) {
 		setErrorText('');
@@ -61,16 +60,9 @@ export default function TodoItem({
 		onEdit(todo.id, newTodoData);
 	}
 
-	const handleSubmitTitleChange = async (
-		e: React.FormEvent<HTMLFormElement>
-	) => {
-		e.preventDefault();
+	const handleSubmitTitleChange = async () => {
+		const todoTitle = form.getFieldsValue().title;
 		const trimmedTodoTitle = todoTitle.trim();
-
-		if (validateTodoTitle(trimmedTodoTitle)) {
-			setErrorText(validateTodoTitle(trimmedTodoTitle));
-			return;
-		}
 
 		try {
 			const newTodoData = {
@@ -85,40 +77,67 @@ export default function TodoItem({
 		setIsEditing(false);
 	};
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTodoTitle(e.target.value);
-		setErrorText('');
-	};
-
 	const handleCancelEditClick = (
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>
 	) => {
 		e.preventDefault();
 		setIsEditing(false);
 		setErrorText('');
-		setTodoTitle(todo.title);
+		form.setFieldValue('title', todo.title);
 	};
 
 	return (
 		<>
 			<div className={styles.todoItem}>
 				<label className={styles.checkbox}>
-					<input
-						type="checkbox"
+					<Checkbox
 						checked={todo.isDone}
 						onChange={(e) => onChangeStatus(e.target.checked)}
 					/>
-					{isEditing ? (
-						<form className={styles.form} onSubmit={handleSubmitTitleChange}>
-							<input
-								className={styles.input}
-								value={todoTitle}
-								onChange={handleInputChange}
-								placeholder="Введите текст задачи..."
-							/>
 
-							<Button disabled={isLoading}>Сохранить</Button>
-						</form>
+					{isEditing ? (
+						<Form
+							form={form}
+							style={{ maxWidth: 800, width: '100%', padding: 8 }}
+							layout="inline"
+							autoComplete="off"
+							onFinish={handleSubmitTitleChange}
+							initialValues={{ title: todo.title }}
+						>
+							<Form.Item
+								name="title"
+								style={{ flex: 1 }}
+								rules={[
+									() => ({
+										validator(_, value) {
+											if (!value.trim()) {
+												return Promise.reject(
+													new Error('Это поле не может быть пустым')
+												);
+											}
+											if (value.trim().length < 2) {
+												return Promise.reject(
+													new Error('Минимальная длина текста 2 символа')
+												);
+											}
+											if (value.trim().length > 64) {
+												return Promise.reject(
+													new Error('Максимальная длина текста 64 символа')
+												);
+											}
+											return Promise.resolve();
+										},
+									}),
+								]}
+							>
+								<Input placeholder="Введите текст задачи..." />
+							</Form.Item>
+							<Form.Item>
+								<Button type="primary" htmlType="submit" disabled={isLoading}>
+									Создать
+								</Button>
+							</Form.Item>
+						</Form>
 					) : (
 						<span
 							className={
@@ -140,41 +159,26 @@ export default function TodoItem({
 					{isEditing ? (
 						<Button
 							onClick={handleCancelEditClick}
-							className={styles.cancelChangesButton}
-							colorVariant="secondary"
+							type="default"
+							disabled={isLoading}
 						>
 							Отмена
 						</Button>
 					) : (
-						<IconButton
+						<Button
 							onClick={() => setIsEditing(!isEditing)}
-							className={styles.editButton}
-							icon={
-								<img
-									src={'/icons/edit.svg'}
-									className={styles.icon}
-									width="24"
-									height="24"
-									alt="edit icon"
-								></img>
-							}
-						></IconButton>
+							color="blue"
+							variant="solid"
+							icon={<EditOutlined />}
+						/>
 					)}
 
-					<IconButton
+					<Button
 						onClick={() => onDelete(todo.id)}
-						colorVariant="danger"
-						className={styles.deleteButton}
-						icon={
-							<img
-								src={'/icons/trash.svg'}
-								className={styles.icon}
-								width="24"
-								height="24"
-								alt="delete icon"
-							></img>
-						}
-					></IconButton>
+						color="danger"
+						variant="solid"
+						icon={<DeleteOutlined />}
+					/>
 				</div>
 			</div>
 			{errorText && <span className={styles.error}>{errorText}</span>}

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import styles from './AddTodoForm.module.scss';
 import { addTodoApi } from '../../api/apiTodos';
-import validateTodoTitle from '../../utils/validate';
-import Button from '../../ui/Button/Button';
+import { Button, Form, Input } from 'antd';
 
 interface AddTodoFormProps {
 	isLoading: boolean;
@@ -15,24 +14,19 @@ export default function HandleAddTodoForm({
 	fetchTodos,
 	setIsLoading,
 }: AddTodoFormProps) {
-	const [todoTitle, setTodoTitle] = useState('');
-	const [errorText, setErrorText] = useState('');
+	const [errorText, setErrorText] = useState<string>('');
+	const [form] = Form.useForm();
 
-	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+	const onSubmit = async () => {
+		const todoTitle = form.getFieldsValue().title;
 		const trimmedTodoTitle = todoTitle.trim();
-
-		if (validateTodoTitle(trimmedTodoTitle)) {
-			setErrorText(validateTodoTitle(trimmedTodoTitle));
-			return;
-		}
 
 		setErrorText('');
 		setIsLoading(true);
 		try {
 			await addTodoApi(trimmedTodoTitle);
 			fetchTodos();
-			setTodoTitle('');
+			form.setFieldValue('title', '');
 		} catch (error) {
 			console.error('Error:', error);
 			setErrorText('Ошибка при добавлении задачи.');
@@ -41,24 +35,49 @@ export default function HandleAddTodoForm({
 		}
 	};
 
-	function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-		setTodoTitle(e.target.value);
-		setErrorText('');
-	}
-
 	return (
 		<>
-			<form className={styles.form} onSubmit={onSubmit}>
-				<input
-					className={styles.input}
-					value={todoTitle}
-					onChange={handleInputChange}
-					placeholder="Введите текст задачи..."
-				/>
-				<Button disabled={isLoading} className={styles.button}>
-					Создать
-				</Button>
-			</form>
+			<Form
+				form={form}
+				style={{ maxWidth: 800, width: '100%', padding: 8 }}
+				layout="inline"
+				autoComplete="off"
+				onFinish={onSubmit}
+			>
+				<Form.Item
+					name="title"
+					style={{ flex: 1 }}
+					rules={[
+						() => ({
+							validator(_, value) {
+								if (!value.trim()) {
+									return Promise.reject(
+										new Error('Это поле не может быть пустым')
+									);
+								}
+								if (value.trim().length < 2) {
+									return Promise.reject(
+										new Error('Минимальная длина текста 2 символа')
+									);
+								}
+								if (value.trim().length > 64) {
+									return Promise.reject(
+										new Error('Максимальная длина текста 64 символа')
+									);
+								}
+								return Promise.resolve();
+							},
+						}),
+					]}
+				>
+					<Input placeholder="Введите текст задачи..." />
+				</Form.Item>
+				<Form.Item>
+					<Button type="primary" htmlType="submit" disabled={isLoading}>
+						Создать
+					</Button>
+				</Form.Item>
+			</Form>
 			{errorText && <span className={styles.error}>{errorText}</span>}
 		</>
 	);
