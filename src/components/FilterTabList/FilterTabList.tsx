@@ -1,7 +1,6 @@
 import type { TodoInfo, ToDoStatus } from '../../types/todo';
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
-import styles from './FilterTabList.module.scss';
 
 type FilterTabListProps = {
 	filter: ToDoStatus;
@@ -36,16 +35,14 @@ export default function FilterTabList({
 	};
 
 	return (
-		<div className={styles.filterTabList}>
-			<Tabs
-				defaultActiveKey="all"
-				activeKey={filter}
-				items={items}
-				onChange={onChange}
-				centered={true}
-				indicator={{ size: 0 }}
-				size="large"
-			/>
-		</div>
+		<Tabs
+			defaultActiveKey="all"
+			activeKey={filter}
+			items={items}
+			onChange={onChange}
+			centered={true}
+			indicator={{ size: 0 }}
+			size="large"
+		/>
 	);
 }

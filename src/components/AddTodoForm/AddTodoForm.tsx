@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import styles from './AddTodoForm.module.scss';
+
 import { addTodoApi } from '../../api/apiTodos';
-import { Button, Form, Input } from 'antd';
+import { Alert, Button, Form, Input } from 'antd';
 
 interface AddTodoFormProps {
 	isLoading: boolean;
@@ -39,7 +39,7 @@ export default function HandleAddTodoForm({
 		<>
 			<Form
 				form={form}
-				style={{ maxWidth: 800, width: '100%', padding: 8 }}
+				style={{ width: '100%', padding: 8 }}
 				layout="inline"
 				autoComplete="off"
 				onFinish={onSubmit}
@@ -78,7 +78,7 @@ export default function HandleAddTodoForm({
 					</Button>
 				</Form.Item>
 			</Form>
-			{errorText && <span className={styles.error}>{errorText}</span>}
+			{errorText && <Alert message={errorText} type="error" showIcon />}
 		</>
 	);
 }

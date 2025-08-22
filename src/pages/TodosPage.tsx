@@ -39,30 +39,32 @@ export function TodosPage() {
 
 	useEffect(() => {
 		fetchTodos();
+		const fetchInterval = setInterval(() => {
+			fetchTodos();
+		}, 5000);
+		return () => clearInterval(fetchInterval);
 	}, [filter, fetchTodos]);
 
 	return (
-		<main>
-			<div className="todo">
-				<AddTodoForm
-					isLoading={isLoading}
-					setIsLoading={setIsLoading}
-					fetchTodos={fetchTodos}
-				/>
-				<FilterTabList
-					filter={filter}
-					setFilter={setFilter}
-					todoInfo={todoInfo}
-				/>
-				<TodoList
-					todos={todos}
-					error={error}
-					fetchTodos={fetchTodos}
-					isLoading={isLoading}
-					setIsLoading={setIsLoading}
-				/>
-			</div>
-		</main>
+		<>
+			<AddTodoForm
+				isLoading={isLoading}
+				setIsLoading={setIsLoading}
+				fetchTodos={fetchTodos}
+			/>
+			<FilterTabList
+				filter={filter}
+				setFilter={setFilter}
+				todoInfo={todoInfo}
+			/>
+			<TodoList
+				todos={todos}
+				error={error}
+				fetchTodos={fetchTodos}
+				isLoading={isLoading}
+				setIsLoading={setIsLoading}
+			/>
+		</>
 	);
 }
 

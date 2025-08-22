@@ -1,8 +1,7 @@
-import styles from './TodoItem.module.scss';
 import { useState } from 'react';
 import type { Todo, TodoRequest } from '../../types/todo';
 import { deleteTodoApi, editTodoApi } from '../../api/apiTodos';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Alert, Button, Card, Checkbox, Col, Form, Input, Row } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 interface TodoItemProps {
@@ -83,105 +82,132 @@ export default function TodoItem({
 		e.preventDefault();
 		setIsEditing(false);
 		setErrorText('');
-		form.setFieldValue('title', todo.title);
+		form.setFieldsValue({ title: todo.title });
 	};
 
 	return (
 		<>
-			<div className={styles.todoItem}>
-				<label className={styles.checkbox}>
-					<Checkbox
-						checked={todo.isDone}
-						onChange={(e) => onChangeStatus(e.target.checked)}
-					/>
-
-					{isEditing ? (
-						<Form
-							form={form}
-							style={{ maxWidth: 800, width: '100%', padding: 8 }}
-							layout="inline"
-							autoComplete="off"
-							onFinish={handleSubmitTitleChange}
-							initialValues={{ title: todo.title }}
-						>
-							<Form.Item
-								name="title"
-								style={{ flex: 1 }}
-								rules={[
-									() => ({
-										validator(_, value) {
-											if (!value.trim()) {
-												return Promise.reject(
-													new Error('Это поле не может быть пустым')
-												);
-											}
-											if (value.trim().length < 2) {
-												return Promise.reject(
-													new Error('Минимальная длина текста 2 символа')
-												);
-											}
-											if (value.trim().length > 64) {
-												return Promise.reject(
-													new Error('Максимальная длина текста 64 символа')
-												);
-											}
-											return Promise.resolve();
-										},
-									}),
-								]}
+			<Card size="small" style={{ margin: '8px 0px' }}>
+				<Row>
+					<Col
+						span={18}
+						style={{
+							display: 'flex',
+							justifyContent: 'start',
+							gap: '20px',
+						}}
+					>
+						<Row>
+							<label
+								style={{
+									display: 'flex',
+									justifyContent: 'start',
+									alignItems: 'center',
+									gap: '20px',
+								}}
 							>
-								<Input placeholder="Введите текст задачи..." />
-							</Form.Item>
-							<Form.Item>
-								<Button type="primary" htmlType="submit" disabled={isLoading}>
-									Сохранить
-								</Button>
-							</Form.Item>
-						</Form>
-					) : (
-						<span
-							className={
-								todo.isDone ? styles.checkedTask : styles.unCheckedTask
-							}
-						>
-							{todo.title}
-						</span>
-					)}
-				</label>
-				<div
-					style={{
-						display: 'flex',
-						justifyContent: 'space-between',
-						gap: '20px',
-						backgroundColor: 'white',
-					}}
-				>
-					{isEditing ? (
-						<Button
-							onClick={handleCancelEditClick}
-							type="default"
-							disabled={isLoading}
-						>
-							Отмена
-						</Button>
-					) : (
-						<Button
-							onClick={() => setIsEditing(!isEditing)}
-							color="blue"
-							variant="solid"
-							icon={<EditOutlined />}
-						/>
-					)}
+								<Checkbox
+									checked={todo.isDone}
+									onChange={(e) => onChangeStatus(e.target.checked)}
+								/>
 
-					<Button
-						onClick={() => onDelete(todo.id)}
-						color="danger"
-						variant="solid"
-						icon={<DeleteOutlined />}
-					/>
-				</div>
-			</div>
-			{errorText && <span className={styles.error}>{errorText}</span>}
+								{isEditing ? (
+									<Form
+										form={form}
+										style={{ maxWidth: 800, width: '100%', padding: 8 }}
+										layout="inline"
+										autoComplete="off"
+										onFinish={handleSubmitTitleChange}
+										initialValues={{ title: todo.title }}
+									>
+										<Form.Item
+											name="title"
+											style={{ flex: 1 }}
+											rules={[
+												() => ({
+													validator(_, value) {
+														if (!value.trim()) {
+															return Promise.reject(
+																new Error('Это поле не может быть пустым')
+															);
+														}
+														if (value.trim().length < 2) {
+															return Promise.reject(
+																new Error('Минимальная длина текста 2 символа')
+															);
+														}
+														if (value.trim().length > 64) {
+															return Promise.reject(
+																new Error(
+																	'Максимальная длина текста 64 символа'
+																)
+															);
+														}
+														return Promise.resolve();
+													},
+												}),
+											]}
+										>
+											<Input placeholder="Введите текст задачи..." />
+										</Form.Item>
+										<Form.Item>
+											<Button
+												type="primary"
+												htmlType="submit"
+												disabled={isLoading}
+											>
+												Сохранить
+											</Button>
+										</Form.Item>
+									</Form>
+								) : (
+									<p
+										style={{
+											textDecorationLine: todo.isDone ? 'line-through' : 'none',
+										}}
+									>
+										{todo.title}
+									</p>
+								)}
+							</label>
+						</Row>
+					</Col>
+					<Col
+						span={6}
+						style={{
+							display: 'flex',
+							justifyContent: 'end',
+							alignItems: 'center',
+							gap: '20px',
+						}}
+					>
+						{isEditing ? (
+							<Button
+								onClick={handleCancelEditClick}
+								type="default"
+								disabled={isLoading}
+							>
+								Отмена
+							</Button>
+						) : (
+							<Button
+								onClick={() => setIsEditing(!isEditing)}
+								color="blue"
+								variant="solid"
+								icon={<EditOutlined />}
+							/>
+						)}
+
+						<Button
+							onClick={() => onDelete(todo.id)}
+							color="danger"
+							variant="solid"
+							icon={<DeleteOutlined />}
+						/>
+					</Col>
+				</Row>
+			</Card>
+			{errorText && <Alert message={errorText} type="error" showIcon />}
 		</>
 	);
 }

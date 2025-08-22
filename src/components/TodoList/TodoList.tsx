@@ -1,6 +1,6 @@
-import styles from './TodoList.module.scss';
 import TodoItem from '../TodoItem/TodoItem';
 import type { Todo } from '../../types/todo';
+import { Alert, Spin } from 'antd';
 
 interface TodoListProps {
 	todos: Todo[];
@@ -19,8 +19,10 @@ export default function TodoList({
 }: TodoListProps) {
 	return (
 		<>
-			{error.length > 0 ? <p>Ошибка загрузки данных...</p> : null}
-			<div className={styles.toDoList}>
+			{error && (
+				<Alert message={'Ошибка загрузки данных...'} type="error" showIcon />
+			)}
+			<div>
 				{todos.length > 0 ? (
 					todos.map((todo) => {
 						return (
@@ -37,7 +39,7 @@ export default function TodoList({
 					<p>Список задач пуст...</p>
 				)}
 			</div>
-			{isLoading && <p>Загрузка...</p>}
+			<div>{isLoading && <Spin />}</div>
 		</>
 	);
 }
