@@ -1,5 +1,5 @@
 import { Layout, Menu, theme, type MenuProps } from 'antd';
-import { useEffect } from 'react';
+
 import { Outlet, useLocation, useNavigate } from 'react-router';
 const { Content, Sider } = Layout;
 
@@ -35,27 +35,13 @@ const HomePageLayout = () => {
 		token: { colorBgContainer, borderRadiusLG },
 	} = theme.useToken();
 
-	useEffect(() => {
-		console.log('location', location.pathname);
-	}, [location]);
-
 	const onClick: MenuProps['onClick'] = (e) => {
 		navigate(e.key);
 	};
 
 	return (
 		<Layout>
-			<Sider
-				style={siderStyle}
-				breakpoint="lg"
-				collapsedWidth="0"
-				onBreakpoint={(broken) => {
-					console.log(broken);
-				}}
-				onCollapse={(collapsed, type) => {
-					console.log(collapsed, type);
-				}}
-			>
+			<Sider style={siderStyle} breakpoint="lg" collapsedWidth="0">
 				<div className="demo-logo-vertical" />
 				<Menu
 					style={{
