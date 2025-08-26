@@ -1,37 +1,37 @@
 import TodoItem from '../TodoItem/TodoItem';
 import type { Todo } from '../../types/todo';
-import { Alert, Spin } from 'antd';
+import { Alert } from 'antd';
+import { memo, useMemo } from 'react';
 
 interface TodoListProps {
 	todos: Todo[];
 	error: string;
 	fetchTodos: () => void;
-	isLoading: boolean;
-	setIsLoading: (arg: boolean) => void;
 }
 
-export default function TodoList({
-	error,
-	isLoading,
-	todos,
-	fetchTodos,
-	setIsLoading,
-}: TodoListProps) {
+const TodoList = memo(({ error, todos, fetchTodos }: TodoListProps) => {
+	const props = useMemo<TodoListProps>(
+		() => ({
+			error,
+			todos,
+			fetchTodos,
+		}),
+		[error, todos, fetchTodos]
+	);
+
 	return (
 		<>
 			{error && (
 				<Alert message={'Ошибка загрузки данных...'} type="error" showIcon />
 			)}
 			<div>
-				{todos.length > 0 ? (
-					todos.map((todo) => {
+				{props.todos.length > 0 ? (
+					props.todos.map((todo) => {
 						return (
 							<TodoItem
 								key={todo.id}
 								todo={todo}
-								fetchTodos={fetchTodos}
-								isLoading={isLoading}
-								setIsLoading={setIsLoading}
+								fetchTodos={props.fetchTodos}
 							/>
 						);
 					})
@@ -39,7 +39,8 @@ export default function TodoList({
 					<p>Список задач пуст...</p>
 				)}
 			</div>
-			<div>{isLoading && <Spin />}</div>
 		</>
 	);
-}
+});
+
+export default TodoList;

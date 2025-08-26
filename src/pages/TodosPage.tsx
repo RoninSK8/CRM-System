@@ -4,6 +4,7 @@ import { getTodos } from '../api/apiTodos';
 import AddTodoForm from '../components/AddTodoForm/AddTodoForm';
 import FilterTabList from '../components/FilterTabList/FilterTabList';
 import TodoList from '../components/TodoList/TodoList';
+import { Spin } from 'antd';
 
 export function TodosPage() {
 	const [error, setError] = useState<string>('');
@@ -21,13 +22,15 @@ export function TodosPage() {
 		try {
 			const { data, info } = await getTodos(filter);
 
-			if (info) {
+			// Сравниваю, отличается ли новый info список от текущего, если да, то обновляю его.
+			if (info && JSON.stringify(info) !== JSON.stringify(todoInfo)) {
 				setTodoInfo(info);
-			} else {
-				setError('Ошибка при загрузке данных о количестве задач');
 			}
-
-			setTodos(data);
+			// TODO
+			// Сравниваю, отличается ли новый список от текущего, если да, то обновляю его.
+			if (JSON.stringify(data) !== JSON.stringify(todos)) {
+				setTodos(data);
+			}
 		} catch (error) {
 			if (error instanceof Error) {
 				setError(error.message);
@@ -35,7 +38,7 @@ export function TodosPage() {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [filter]);
+	}, [filter, todos, todoInfo]);
 
 	useEffect(() => {
 		fetchTodos();
@@ -47,23 +50,14 @@ export function TodosPage() {
 
 	return (
 		<>
-			<AddTodoForm
-				isLoading={isLoading}
-				setIsLoading={setIsLoading}
-				fetchTodos={fetchTodos}
-			/>
+			<AddTodoForm fetchTodos={fetchTodos} />
 			<FilterTabList
 				filter={filter}
 				setFilter={setFilter}
 				todoInfo={todoInfo}
 			/>
-			<TodoList
-				todos={todos}
-				error={error}
-				fetchTodos={fetchTodos}
-				isLoading={isLoading}
-				setIsLoading={setIsLoading}
-			/>
+			<TodoList todos={todos} error={error} fetchTodos={fetchTodos} />
+			{isLoading && <Spin />}
 		</>
 	);
 }

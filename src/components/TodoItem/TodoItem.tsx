@@ -6,19 +6,13 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 interface TodoItemProps {
 	todo: Todo;
-	isLoading: boolean;
-	setIsLoading: (arg: boolean) => void;
 	fetchTodos: () => void;
 }
 
-export default function TodoItem({
-	todo,
-	isLoading,
-	setIsLoading,
-	fetchTodos,
-}: TodoItemProps) {
+const TodoItem = ({ todo, fetchTodos }: TodoItemProps) => {
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [errorText, setErrorText] = useState<string>('');
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [form] = Form.useForm();
 
 	async function onDelete(id: number) {
@@ -29,7 +23,6 @@ export default function TodoItem({
 			await fetchTodos();
 		} catch (error) {
 			if (error instanceof Error) {
-				console.log(error);
 				setErrorText(error.message);
 			}
 		} finally {
@@ -210,4 +203,6 @@ export default function TodoItem({
 			{errorText && <Alert message={errorText} type="error" showIcon />}
 		</>
 	);
-}
+};
+
+export default TodoItem;

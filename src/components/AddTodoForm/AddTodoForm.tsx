@@ -1,20 +1,14 @@
-import { useState } from 'react';
-
+import { memo, useState } from 'react';
 import { addTodoApi } from '../../api/apiTodos';
 import { Alert, Button, Form, Input } from 'antd';
 
 interface AddTodoFormProps {
-	isLoading: boolean;
 	fetchTodos: () => void;
-	setIsLoading: (arg: boolean) => void;
 }
 
-export default function HandleAddTodoForm({
-	isLoading,
-	fetchTodos,
-	setIsLoading,
-}: AddTodoFormProps) {
+const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
 	const [errorText, setErrorText] = useState<string>('');
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [form] = Form.useForm();
 
 	const onSubmit = async () => {
@@ -81,4 +75,6 @@ export default function HandleAddTodoForm({
 			{errorText && <Alert message={errorText} type="error" showIcon />}
 		</>
 	);
-}
+});
+
+export default AddTodoForm;
