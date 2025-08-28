@@ -1,6 +1,6 @@
 import { memo, useState } from 'react';
 import { addTodoApi } from '../../api/apiTodos';
-import { Alert, Button, Form, Input } from 'antd';
+import { Alert, Button, Form, Input, type FormProps } from 'antd';
 
 interface AddTodoFormProps {
   fetchTodos: () => void;
@@ -11,16 +11,15 @@ const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
 
-  const onSubmit = async () => {
-    const todoTitle = form.getFieldsValue().title;
-    const trimmedTodoTitle = todoTitle.trim();
+  const onSubmit: FormProps<{ title: string }>['onFinish'] = async (values) => {
+    const todoTitle = values.title;
 
     setErrorText('');
     setIsLoading(true);
     try {
-      await addTodoApi(trimmedTodoTitle);
+      await addTodoApi(todoTitle);
       fetchTodos();
-      form.setFieldValue('title', '');
+      form.resetFields();
     } catch (error) {
       console.error('Error:', error);
       setErrorText('Ошибка при добавлении задачи.');
@@ -34,45 +33,31 @@ const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
       <Form
         form={form}
         style={{ width: '100%', padding: 8 }}
-        layout="inline"
-        autoComplete="off"
+        layout='inline'
+        autoComplete='off'
         onFinish={onSubmit}
       >
         <Form.Item
-          name="title"
+          name='title'
           style={{ flex: 1 }}
           rules={[
-            () => ({
-              validator(_, value) {
-                if (!value.trim()) {
-                  return Promise.reject(
-                    new Error('Это поле не может быть пустым'),
-                  );
-                }
-                if (value.trim().length < 2) {
-                  return Promise.reject(
-                    new Error('Минимальная длина текста 2 символа'),
-                  );
-                }
-                if (value.trim().length > 64) {
-                  return Promise.reject(
-                    new Error('Максимальная длина текста 64 символа'),
-                  );
-                }
-                return Promise.resolve();
-              },
-            }),
+            {
+              required: true,
+              message: 'Это поле не может быть пустым',
+            },
+            { min: 2, message: 'Минимальная длина текста 2 символа' },
+            { max: 64, message: 'Максимальная длина текста 64 символа' },
           ]}
         >
-          <Input placeholder="Введите текст задачи..." />
+          <Input placeholder='Введите текст задачи...' />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" disabled={isLoading}>
+          <Button type='primary' htmlType='submit' disabled={isLoading}>
             Создать
           </Button>
         </Form.Item>
       </Form>
-      {errorText && <Alert message={errorText} type="error" showIcon />}
+      {errorText && <Alert message={errorText} type='error' showIcon />}
     </>
   );
 });

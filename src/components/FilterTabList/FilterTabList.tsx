@@ -26,7 +26,8 @@ const FilterTabList = memo(
       },
     ];
 
-    const onChange = (key: string) => {
+    // antd передаёт стрингу, поэтому кастую к ToDoStatus и делаю тайп гард
+    const handleChange = (key: ToDoStatus) => {
       if (key === 'all' || key === 'inWork' || key === 'completed') {
         setFilter(key);
       }
@@ -34,16 +35,16 @@ const FilterTabList = memo(
 
     return (
       <Tabs
-        defaultActiveKey="all"
+        defaultActiveKey='all'
         activeKey={filter}
         items={items}
-        onChange={onChange}
+        onChange={(activeKey) => handleChange(activeKey as ToDoStatus)}
         centered={true}
         indicator={{ size: 0 }}
-        size="large"
+        size='large'
       />
     );
-  },
+  }
 );
 
 export default FilterTabList;
