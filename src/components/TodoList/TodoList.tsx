@@ -1,7 +1,7 @@
-import TodoItem from "../TodoItem/TodoItem";
-import type { Todo } from "../../types/todo";
-import { Alert } from "antd";
-import { memo, useMemo } from "react";
+import TodoItem from '../TodoItem/TodoItem';
+import type { Todo } from '../../types/todo';
+import { Alert } from 'antd';
+import { memo, useMemo } from 'react';
 
 interface TodoListProps {
   todos: Todo[];
@@ -22,7 +22,7 @@ const TodoList = memo(({ error, todos, fetchTodos }: TodoListProps) => {
   return (
     <>
       {error && (
-        <Alert message={"Ошибка загрузки данных..."} type="error" showIcon />
+        <Alert message={'Ошибка загрузки данных...'} type="error" showIcon />
       )}
       <div>
         {props.todos.length > 0 ? (

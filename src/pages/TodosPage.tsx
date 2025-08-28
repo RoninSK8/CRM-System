@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
-import type { Todo, TodoInfo, ToDoStatus } from "../types/todo";
-import { getTodos } from "../api/apiTodos";
-import AddTodoForm from "../components/AddTodoForm/AddTodoForm";
-import FilterTabList from "../components/FilterTabList/FilterTabList";
-import TodoList from "../components/TodoList/TodoList";
-import { Spin } from "antd";
+import { useCallback, useEffect, useState } from 'react';
+import type { Todo, TodoInfo, ToDoStatus } from '../types/todo';
+import { getTodos } from '../api/apiTodos';
+import AddTodoForm from '../components/AddTodoForm/AddTodoForm';
+import FilterTabList from '../components/FilterTabList/FilterTabList';
+import TodoList from '../components/TodoList/TodoList';
+import { Spin } from 'antd';
 
 export function TodosPage() {
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [filter, setFilter] = useState<ToDoStatus>("all");
+  const [filter, setFilter] = useState<ToDoStatus>('all');
   const [todoInfo, setTodoInfo] = useState<TodoInfo>({
     all: 0,
     completed: 0,

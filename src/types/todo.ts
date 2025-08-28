@@ -3,7 +3,7 @@ export interface TodoRequest {
   isDone?: boolean; // изменение статуса задачи происходит через этот флаг
 }
 
-export type ToDoStatus = "all" | "completed" | "inWork";
+export type ToDoStatus = 'all' | 'completed' | 'inWork';
 
 export interface Todo {
   id: number;

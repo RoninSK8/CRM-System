@@ -4,8 +4,8 @@ import type {
   TodoInfo,
   TodoRequest,
   ToDoStatus,
-} from "../types/todo";
-import axios from "axios";
+} from '../types/todo';
+import axios from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_DATABASE_URL,
@@ -17,10 +17,10 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     if (axios.isAxiosError(error)) {
-      console.error("interceptors request", error.message);
-      throw new Error("Ошибка: " + error.message);
+      console.error('interceptors request', error.message);
+      throw new Error('Ошибка: ' + error.message);
     } else {
-      throw new Error("Ошибка отправки данных");
+      throw new Error('Ошибка отправки данных');
     }
   },
 );
@@ -31,9 +31,9 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     if (axios.isAxiosError(error)) {
-      throw new Error("Ошибка: " + error.message);
+      throw new Error('Ошибка: ' + error.message);
     } else {
-      throw new Error("Не удалось получить данные");
+      throw new Error('Не удалось получить данные');
     }
   },
 );
@@ -44,16 +44,16 @@ export async function addTodoApi(title: string): Promise<Todo> {
     isDone: false,
   };
 
-  const response = await axiosInstance.post<Todo>("/todos", userData);
+  const response = await axiosInstance.post<Todo>('/todos', userData);
   const data = response.data;
   return data;
 }
 
 export async function getTodos(
-  status: ToDoStatus = "all",
+  status: ToDoStatus = 'all',
 ): Promise<MetaResponse<Todo, TodoInfo>> {
   const response = await axiosInstance.get<MetaResponse<Todo, TodoInfo>>(
-    "/todos",
+    '/todos',
     {
       params: {
         filter: status,

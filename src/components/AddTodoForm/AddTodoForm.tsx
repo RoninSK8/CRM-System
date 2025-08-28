@@ -1,13 +1,13 @@
-import { memo, useState } from "react";
-import { addTodoApi } from "../../api/apiTodos";
-import { Alert, Button, Form, Input } from "antd";
+import { memo, useState } from 'react';
+import { addTodoApi } from '../../api/apiTodos';
+import { Alert, Button, Form, Input } from 'antd';
 
 interface AddTodoFormProps {
   fetchTodos: () => void;
 }
 
 const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
-  const [errorText, setErrorText] = useState<string>("");
+  const [errorText, setErrorText] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
 
@@ -15,15 +15,15 @@ const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
     const todoTitle = form.getFieldsValue().title;
     const trimmedTodoTitle = todoTitle.trim();
 
-    setErrorText("");
+    setErrorText('');
     setIsLoading(true);
     try {
       await addTodoApi(trimmedTodoTitle);
       fetchTodos();
-      form.setFieldValue("title", "");
+      form.setFieldValue('title', '');
     } catch (error) {
-      console.error("Error:", error);
-      setErrorText("Ошибка при добавлении задачи.");
+      console.error('Error:', error);
+      setErrorText('Ошибка при добавлении задачи.');
     } finally {
       setIsLoading(false);
     }
@@ -33,7 +33,7 @@ const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
     <>
       <Form
         form={form}
-        style={{ width: "100%", padding: 8 }}
+        style={{ width: '100%', padding: 8 }}
         layout="inline"
         autoComplete="off"
         onFinish={onSubmit}
@@ -46,17 +46,17 @@ const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
               validator(_, value) {
                 if (!value.trim()) {
                   return Promise.reject(
-                    new Error("Это поле не может быть пустым"),
+                    new Error('Это поле не может быть пустым'),
                   );
                 }
                 if (value.trim().length < 2) {
                   return Promise.reject(
-                    new Error("Минимальная длина текста 2 символа"),
+                    new Error('Минимальная длина текста 2 символа'),
                   );
                 }
                 if (value.trim().length > 64) {
                   return Promise.reject(
-                    new Error("Максимальная длина текста 64 символа"),
+                    new Error('Максимальная длина текста 64 символа'),
                   );
                 }
                 return Promise.resolve();

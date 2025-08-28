@@ -1,30 +1,30 @@
-import { Layout, Menu, theme, type MenuProps } from "antd";
+import { Layout, Menu, theme, type MenuProps } from 'antd';
 
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate } from 'react-router';
 const { Content, Sider } = Layout;
 
-type MenuItem = Required<MenuProps>["items"][number];
+type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
   {
-    key: "/todos",
-    label: "Список задач",
+    key: '/todos',
+    label: 'Список задач',
   },
   {
-    key: "/profile",
-    label: "Профиль",
+    key: '/profile',
+    label: 'Профиль',
   },
 ];
 
 const siderStyle: React.CSSProperties = {
-  overflow: "auto",
-  height: "100vh",
-  position: "sticky",
+  overflow: 'auto',
+  height: '100vh',
+  position: 'sticky',
   insetInlineStart: 0,
   top: 0,
   bottom: 0,
-  scrollbarWidth: "thin",
-  scrollbarGutter: "stable",
+  scrollbarWidth: 'thin',
+  scrollbarGutter: 'stable',
 };
 
 const HomePageLayout = () => {
@@ -35,7 +35,7 @@ const HomePageLayout = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const onClick: MenuProps["onClick"] = (e) => {
+  const onClick: MenuProps['onClick'] = (e) => {
     navigate(e.key);
   };
 
@@ -56,7 +56,7 @@ const HomePageLayout = () => {
       </Sider>
       <Layout>
         {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
-        <Content style={{ margin: "24px 16px 0" }}>
+        <Content style={{ margin: '24px 16px 0' }}>
           <div
             style={{
               padding: 24,
