@@ -1,11 +1,11 @@
-import '@ant-design/v5-patch-for-react-19';
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import './main.scss';
-import App from './App.tsx';
+import "@ant-design/v5-patch-for-react-19";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./main.scss";
+import App from "./App.tsx";
 
-createRoot(document.getElementById('root')!).render(
-	<StrictMode>
-		<App />
-	</StrictMode>
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
 );
