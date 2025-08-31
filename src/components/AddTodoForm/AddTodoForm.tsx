@@ -1,65 +1,65 @@
-import { useState } from 'react';
-import styles from './AddTodoForm.module.scss';
+import { memo, useState } from 'react';
 import { addTodoApi } from '../../api/apiTodos';
-import validateTodoTitle from '../../utils/validate';
-import Button from '../../ui/Button/Button';
+import { Alert, Button, Form, Input, type FormProps } from 'antd';
 
 interface AddTodoFormProps {
-	isLoading: boolean;
-	fetchTodos: () => void;
-	setIsLoading: (arg: boolean) => void;
+  fetchTodos: () => void;
 }
 
-export default function HandleAddTodoForm({
-	isLoading,
-	fetchTodos,
-	setIsLoading,
-}: AddTodoFormProps) {
-	const [todoTitle, setTodoTitle] = useState('');
-	const [errorText, setErrorText] = useState('');
+const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
+  const [errorText, setErrorText] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [form] = Form.useForm();
 
-	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		const trimmedTodoTitle = todoTitle.trim();
+  const onSubmit: FormProps<{ title: string }>['onFinish'] = async (values) => {
+    const todoTitle = values.title;
 
-		if (validateTodoTitle(trimmedTodoTitle)) {
-			setErrorText(validateTodoTitle(trimmedTodoTitle));
-			return;
-		}
+    setErrorText('');
+    setIsLoading(true);
+    try {
+      await addTodoApi(todoTitle);
+      fetchTodos();
+      form.resetFields();
+    } catch (error) {
+      console.error('Error:', error);
+      setErrorText('Ошибка при добавлении задачи.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-		setErrorText('');
-		setIsLoading(true);
-		try {
-			await addTodoApi(trimmedTodoTitle);
-			fetchTodos();
-			setTodoTitle('');
-		} catch (error) {
-			console.error('Error:', error);
-			setErrorText('Ошибка при добавлении задачи.');
-		} finally {
-			setIsLoading(false);
-		}
-	};
+  return (
+    <>
+      <Form
+        form={form}
+        style={{ width: '100%', padding: 8 }}
+        layout='inline'
+        autoComplete='off'
+        onFinish={onSubmit}
+      >
+        <Form.Item
+          name='title'
+          style={{ flex: 1 }}
+          rules={[
+            {
+              required: true,
+              message: 'Это поле не может быть пустым',
+            },
+            { min: 2, message: 'Минимальная длина текста 2 символа' },
+            { max: 64, message: 'Максимальная длина текста 64 символа' },
+          ]}
+        >
+          <Input placeholder='Введите текст задачи...' />
+        </Form.Item>
+        <Form.Item>
+          <Button type='primary' htmlType='submit' disabled={isLoading}>
+            Создать
+          </Button>
+        </Form.Item>
+      </Form>
+      {errorText && <Alert message={errorText} type='error' showIcon />}
+    </>
+  );
+});
 
-	function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-		setTodoTitle(e.target.value);
-		setErrorText('');
-	}
-
-	return (
-		<>
-			<form className={styles.form} onSubmit={onSubmit}>
-				<input
-					className={styles.input}
-					value={todoTitle}
-					onChange={handleInputChange}
-					placeholder="Введите текст задачи..."
-				/>
-				<Button disabled={isLoading} className={styles.button}>
-					Создать
-				</Button>
-			</form>
-			{errorText && <span className={styles.error}>{errorText}</span>}
-		</>
-	);
-}
+export default AddTodoForm;

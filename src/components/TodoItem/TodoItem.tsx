@@ -1,183 +1,208 @@
-import styles from './TodoItem.module.scss';
 import { useState } from 'react';
 import type { Todo, TodoRequest } from '../../types/todo';
-import validateTodoTitle from '../../utils/validate';
-import Button from '../../ui/Button/Button';
 import { deleteTodoApi, editTodoApi } from '../../api/apiTodos';
-import IconButton from '../../ui/IconButton/IconButton';
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Form,
+  Input,
+  Row,
+  type CheckboxChangeEvent,
+  type FormProps,
+} from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 interface TodoItemProps {
-	todo: Todo;
-	isLoading: boolean;
-	setIsLoading: (arg: boolean) => void;
-	fetchTodos: () => void;
+  todo: Todo;
+  fetchTodos: () => void;
 }
 
-export default function TodoItem({
-	todo,
-	isLoading,
-	setIsLoading,
-	fetchTodos,
-}: TodoItemProps) {
-	const [isEditing, setIsEditing] = useState(false);
-	const [todoTitle, setTodoTitle] = useState(todo.title);
-	const [errorText, setErrorText] = useState('');
+const TodoItem = ({ todo, fetchTodos }: TodoItemProps) => {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [errorText, setErrorText] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [form] = Form.useForm();
 
-	async function onDelete(id: number) {
-		setErrorText('');
-		setIsLoading(true);
-		try {
-			await deleteTodoApi(id);
-			await fetchTodos();
-		} catch (error) {
-			if (error instanceof Error) {
-				console.log(error);
-				setErrorText(error.message);
-			}
-		} finally {
-			setIsLoading(false);
-		}
-	}
+  async function onDelete(id: number) {
+    setErrorText('');
+    setIsLoading(true);
+    try {
+      await deleteTodoApi(id);
+      await fetchTodos();
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorText(error.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
-	async function onEdit(id: number, todoData: TodoRequest) {
-		setErrorText('');
-		setIsLoading(true);
-		try {
-			await editTodoApi(id, todoData);
-			fetchTodos();
-		} catch (error) {
-			if (error instanceof Error) {
-				setErrorText(error.message);
-			}
-		} finally {
-			setIsLoading(false);
-		}
-	}
+  async function onEdit(id: number, todoData: TodoRequest) {
+    setErrorText('');
+    setIsLoading(true);
+    try {
+      await editTodoApi(id, todoData);
+      fetchTodos();
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorText(error.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
-	function onChangeStatus(isChecked: boolean) {
-		const newTodoData = {
-			isDone: isChecked,
-		};
-		onEdit(todo.id, newTodoData);
-	}
+  function handleChangeStatus(e: CheckboxChangeEvent) {
+    const isChecked = e.target.checked;
+    const newTodoData = {
+      isDone: isChecked,
+    };
+    onEdit(todo.id, newTodoData);
+  }
 
-	const handleSubmitTitleChange = async (
-		e: React.FormEvent<HTMLFormElement>
-	) => {
-		e.preventDefault();
-		const trimmedTodoTitle = todoTitle.trim();
+  const handleSubmitTitleChange: FormProps<{
+    title: string;
+  }>['onFinish'] = async (values) => {
+    const todoTitle = values.title;
 
-		if (validateTodoTitle(trimmedTodoTitle)) {
-			setErrorText(validateTodoTitle(trimmedTodoTitle));
-			return;
-		}
+    try {
+      const newTodoData = {
+        title: todoTitle,
+      };
+      await onEdit(todo.id, newTodoData);
+    } catch (error) {
+      console.error('Error:', error);
+      setErrorText('Ошибка при добавлении задачи.');
+      return;
+    }
+    setIsEditing(false);
+  };
 
-		try {
-			const newTodoData = {
-				title: trimmedTodoTitle,
-			};
-			await onEdit(todo.id, newTodoData);
-		} catch (error) {
-			console.error('Error:', error);
-			setErrorText('Ошибка при добавлении задачи.');
-			return;
-		}
-		setIsEditing(false);
-	};
+  const handleCancelEditClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setIsEditing(false);
+    setErrorText('');
+    form.setFieldsValue({ title: todo.title });
+  };
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setTodoTitle(e.target.value);
-		setErrorText('');
-	};
+  return (
+    <>
+      <Card size='small' style={{ margin: '8px 0px' }}>
+        <Row>
+          <Col
+            span={18}
+            style={{
+              display: 'flex',
+              justifyContent: 'start',
+              gap: '20px',
+            }}
+          >
+            <Row>
+              <label
+                style={{
+                  display: 'flex',
+                  justifyContent: 'start',
+                  alignItems: 'center',
+                  gap: '20px',
+                }}
+              >
+                <Checkbox checked={todo.isDone} onChange={handleChangeStatus} />
 
-	const handleCancelEditClick = (
-		e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-	) => {
-		e.preventDefault();
-		setIsEditing(false);
-		setErrorText('');
-		setTodoTitle(todo.title);
-	};
+                {isEditing ? (
+                  <Form
+                    form={form}
+                    style={{ maxWidth: 800, width: '100%', padding: 8 }}
+                    layout='inline'
+                    autoComplete='off'
+                    onFinish={handleSubmitTitleChange}
+                    initialValues={{ title: todo.title }}
+                  >
+                    <Form.Item
+                      name='title'
+                      style={{ flex: 1 }}
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Это поле не может быть пустым',
+                        },
+                        {
+                          min: 2,
+                          message: 'Минимальная длина текста 2 символа',
+                        },
+                        {
+                          max: 64,
+                          message: 'Максимальная длина текста 64 символа',
+                        },
+                      ]}
+                    >
+                      <Input placeholder='Введите текст задачи...' />
+                    </Form.Item>
+                    <Form.Item>
+                      <Button
+                        type='primary'
+                        htmlType='submit'
+                        disabled={isLoading}
+                      >
+                        Сохранить
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                ) : (
+                  <p
+                    style={{
+                      textDecorationLine: todo.isDone ? 'line-through' : 'none',
+                    }}
+                  >
+                    {todo.title}
+                  </p>
+                )}
+              </label>
+            </Row>
+          </Col>
+          <Col
+            span={6}
+            style={{
+              display: 'flex',
+              justifyContent: 'end',
+              alignItems: 'center',
+              gap: '20px',
+            }}
+          >
+            {isEditing ? (
+              <Button
+                onClick={handleCancelEditClick}
+                type='default'
+                disabled={isLoading}
+              >
+                Отмена
+              </Button>
+            ) : (
+              <Button
+                onClick={() => setIsEditing(!isEditing)}
+                color='primary'
+                variant='solid'
+                icon={<EditOutlined />}
+              />
+            )}
 
-	return (
-		<>
-			<div className={styles.todoItem}>
-				<label className={styles.checkbox}>
-					<input
-						type="checkbox"
-						checked={todo.isDone}
-						onChange={(e) => onChangeStatus(e.target.checked)}
-					/>
-					{isEditing ? (
-						<form className={styles.form} onSubmit={handleSubmitTitleChange}>
-							<input
-								className={styles.input}
-								value={todoTitle}
-								onChange={handleInputChange}
-								placeholder="Введите текст задачи..."
-							/>
+            <Button
+              onClick={() => onDelete(todo.id)}
+              color='danger'
+              variant='solid'
+              icon={<DeleteOutlined />}
+            />
+          </Col>
+        </Row>
+      </Card>
+      {errorText && <Alert message={errorText} type='error' showIcon />}
+    </>
+  );
+};
 
-							<Button disabled={isLoading}>Сохранить</Button>
-						</form>
-					) : (
-						<span
-							className={
-								todo.isDone ? styles.checkedTask : styles.unCheckedTask
-							}
-						>
-							{todo.title}
-						</span>
-					)}
-				</label>
-				<div
-					style={{
-						display: 'flex',
-						justifyContent: 'space-between',
-						gap: '20px',
-						backgroundColor: 'white',
-					}}
-				>
-					{isEditing ? (
-						<Button
-							onClick={handleCancelEditClick}
-							className={styles.cancelChangesButton}
-							colorVariant="secondary"
-						>
-							Отмена
-						</Button>
-					) : (
-						<IconButton
-							onClick={() => setIsEditing(!isEditing)}
-							className={styles.editButton}
-							icon={
-								<img
-									src={'/icons/edit.svg'}
-									className={styles.icon}
-									width="24"
-									height="24"
-									alt="edit icon"
-								></img>
-							}
-						></IconButton>
-					)}
-
-					<IconButton
-						onClick={() => onDelete(todo.id)}
-						colorVariant="danger"
-						className={styles.deleteButton}
-						icon={
-							<img
-								src={'/icons/trash.svg'}
-								className={styles.icon}
-								width="24"
-								height="24"
-								alt="delete icon"
-							></img>
-						}
-					></IconButton>
-				</div>
-			</div>
-			{errorText && <span className={styles.error}>{errorText}</span>}
-		</>
-	);
-}
+export default TodoItem;
