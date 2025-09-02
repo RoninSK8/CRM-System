@@ -2,12 +2,15 @@ import { createBrowserRouter, redirect, RouterProvider } from 'react-router';
 import TodosPage from './pages/TodosPage';
 import ProfilePage from './pages/ProfilePage';
 
-import SideMenu from './layout/HomePageLayout';
+import HomePageLayout from './layout/HomePageLayout';
+import Authorization from './layout/Authorization';
+import LoginForm from './components/LoginForm/LoginForm';
+import RegisterForm from './components/RegistrationForm/RegistrationForm';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <SideMenu />,
+    element: <HomePageLayout />,
     children: [
       {
         index: true,
@@ -20,6 +23,20 @@ const router = createBrowserRouter([
       {
         path: '/profile',
         element: <ProfilePage />,
+      },
+    ],
+  },
+  {
+    path: '/auth',
+    element: <Authorization />,
+    children: [
+      {
+        path: 'login',
+        element: <LoginForm />,
+      },
+      {
+        path: 'register',
+        element: <RegisterForm />,
       },
     ],
   },
