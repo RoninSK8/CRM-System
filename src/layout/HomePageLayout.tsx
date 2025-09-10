@@ -1,6 +1,6 @@
 import { Layout, Menu, theme, type MenuProps } from 'antd';
 
-import { Outlet, useLocation, useNavigate } from 'react-router';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 const { Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -41,14 +41,14 @@ const HomePageLayout = () => {
 
   return (
     <Layout>
-      <Sider style={siderStyle} breakpoint="lg" collapsedWidth="0">
-        <div className="demo-logo-vertical" />
+      <Sider style={siderStyle} breakpoint='lg' collapsedWidth='0'>
+        <div className='demo-logo-vertical' />
         <Menu
           style={{
             padding: 24,
           }}
-          theme="dark"
-          mode="inline"
+          theme='dark'
+          mode='inline'
           selectedKeys={[location.pathname]}
           items={items}
           onSelect={onClick}

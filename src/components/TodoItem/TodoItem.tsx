@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import type { Todo, TodoRequest } from '../../types/todo';
-import { deleteTodoApi, editTodoApi } from '../../api/apiTodos';
+import type { Todo } from '../../types/types';
 import {
   Alert,
   Button,
@@ -14,54 +13,27 @@ import {
   type FormProps,
 } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { todosApi } from '../../store/Todos/api';
 
 interface TodoItemProps {
   todo: Todo;
-  fetchTodos: () => void;
 }
 
-const TodoItem = ({ todo, fetchTodos }: TodoItemProps) => {
+const TodoItem = ({ todo }: TodoItemProps) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
 
-  async function onDelete(id: number) {
-    setErrorText('');
-    setIsLoading(true);
-    try {
-      await deleteTodoApi(id);
-      await fetchTodos();
-    } catch (error) {
-      if (error instanceof Error) {
-        setErrorText(error.message);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function onEdit(id: number, todoData: TodoRequest) {
-    setErrorText('');
-    setIsLoading(true);
-    try {
-      await editTodoApi(id, todoData);
-      fetchTodos();
-    } catch (error) {
-      if (error instanceof Error) {
-        setErrorText(error.message);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const [deleteTodo] = todosApi.useDeleteTodoMutation();
+  const [editTodo, { isLoading: isSavingEdit }] =
+    todosApi.useEditTodoMutation();
 
   function handleChangeStatus(e: CheckboxChangeEvent) {
     const isChecked = e.target.checked;
     const newTodoData = {
       isDone: isChecked,
     };
-    onEdit(todo.id, newTodoData);
+    editTodo({ id: todo.id, todoData: newTodoData });
   }
 
   const handleSubmitTitleChange: FormProps<{
@@ -73,7 +45,7 @@ const TodoItem = ({ todo, fetchTodos }: TodoItemProps) => {
       const newTodoData = {
         title: todoTitle,
       };
-      await onEdit(todo.id, newTodoData);
+      await editTodo({ id: todo.id, todoData: newTodoData });
     } catch (error) {
       console.error('Error:', error);
       setErrorText('Ошибка при добавлении задачи.');
@@ -147,7 +119,7 @@ const TodoItem = ({ todo, fetchTodos }: TodoItemProps) => {
                       <Button
                         type='primary'
                         htmlType='submit'
-                        disabled={isLoading}
+                        disabled={isSavingEdit}
                       >
                         Сохранить
                       </Button>
@@ -178,7 +150,7 @@ const TodoItem = ({ todo, fetchTodos }: TodoItemProps) => {
               <Button
                 onClick={handleCancelEditClick}
                 type='default'
-                disabled={isLoading}
+                disabled={isSavingEdit}
               >
                 Отмена
               </Button>
@@ -192,7 +164,7 @@ const TodoItem = ({ todo, fetchTodos }: TodoItemProps) => {
             )}
 
             <Button
-              onClick={() => onDelete(todo.id)}
+              onClick={() => deleteTodo(todo.id)}
               color='danger'
               variant='solid'
               icon={<DeleteOutlined />}
