@@ -1,10 +1,9 @@
 import type { ToDoStatus } from '../../types/types';
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
-import { useAppSelector } from '../../store/redux';
 import { selectFilter, setFilter } from '../../store/Todos/filter.slice';
 import { todosApi } from '../../store/Todos/api';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const FilterTabList = () => {
   const dispatch = useDispatch();
@@ -33,19 +32,19 @@ const FilterTabList = () => {
     },
   ];
 
-  const filter = useAppSelector((state) => selectFilter(state).filter);
+  const selectedFilter = useSelector(selectFilter);
 
   // antd передаёт стрингу, поэтому кастую к ToDoStatus и делаю тайп гард
   const handleChange = (key: ToDoStatus) => {
     if (key === 'all' || key === 'inWork' || key === 'completed') {
-      dispatch(setFilter({ filter: key }));
+      dispatch(setFilter({ selectedFilter: key }));
     }
   };
 
   return (
     <Tabs
       defaultActiveKey='all'
-      activeKey={filter}
+      activeKey={selectedFilter}
       items={items}
       onChange={(activeKey) => handleChange(activeKey as ToDoStatus)}
       centered={true}

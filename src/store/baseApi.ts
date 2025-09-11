@@ -15,6 +15,7 @@ export const baseQuery = fetchBaseQuery({
   baseUrl: baseUrl,
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.userAccessToken;
+
     if (token) {
       headers.set('authorization', `Bearer ${token}`);
     }
@@ -29,26 +30,39 @@ export const baseQueryWithReauth: BaseQueryFn<
 > = async (args, store, extraOptions) => {
   let result = await baseQuery(args, store, extraOptions);
 
+  // ошибка приходит в таком формате, чего не ожидаает обработчик, поэтому проверяю на наличие 'originalStatus' чтобы не ругался ts
+  // {
+  //   "error": {
+  //       "status": "PARSING_ERROR",
+  //       "originalStatus": 409,
+  //       "data": "user already exists\n",
+  //       "error": "SyntaxError: Unexpected token 'u', \"user already exists\n\" is not valid JSON"
+  //   },
+  //   "meta": {
+  //       "request": {},
+  //       "response": {}
+  //   }
+  // }
+
   if (
     result.error &&
-    (result.error.status === 401 || result.error.status === 403)
+    'originalStatus' in result.error &&
+    result.error.originalStatus === 401
   ) {
-    const authState = (store.getState() as RootState).auth;
-    if (!authState.userAccessToken || !authState.userRefreshToken)
+    const refreshToken = localStorage.getItem('userRefreshToken');
+    if (!refreshToken) {
       return result;
-
-    console.log('before refresh call');
+    }
 
     const refreshResult = await baseQuery(
       {
-        url: 'auth/refresh',
+        url: '/auth/refresh',
         method: 'POST',
-        body: { refreshToken: authState.userRefreshToken },
+        body: { refreshToken: refreshToken },
       },
       store,
       extraOptions
     );
-    console.log('after refresh call', refreshResult.data);
 
     if (refreshResult.data) {
       const tokenResponse = refreshResult.data as Token;
@@ -59,10 +73,12 @@ export const baseQueryWithReauth: BaseQueryFn<
         })
       );
       localStorage.setItem('userRefreshToken', tokenResponse.refreshToken);
-      // Retry the original request
+      // Пробуем заново изначальный запрос
       result = await baseQuery(args, store, extraOptions);
     } else {
       store.dispatch(logoutUser());
+      localStorage.removeItem('userRefreshToken');
+      window.location.href = '/auth/login';
     }
   }
   return result;
@@ -70,7 +86,7 @@ export const baseQueryWithReauth: BaseQueryFn<
 
 export const baseApi = createApi({
   reducerPath: 'api',
-  tagTypes: ['Todo'],
+  tagTypes: ['Todo', 'UserProfile'],
   baseQuery: baseQueryWithReauth,
   endpoints: () => ({}),
 });

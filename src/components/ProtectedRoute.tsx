@@ -11,6 +11,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
 }) => {
   const refreshToken = localStorage.getItem('userRefreshToken');
+
   if (!refreshToken) {
     return <Navigate to={redirectTo} replace />;
   }

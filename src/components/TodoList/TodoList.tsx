@@ -1,12 +1,12 @@
 import TodoItem from '../TodoItem/TodoItem';
 import { Alert, Spin } from 'antd';
 import { todosApi } from '../../store/Todos/api';
-import { useAppSelector } from '../../store/redux';
 import { selectFilter } from '../../store/Todos/filter.slice';
+import { useSelector } from 'react-redux';
 
 const TodoList = () => {
-  const filterState = useAppSelector((state) => selectFilter(state).filter);
-  const { data, error, isLoading } = todosApi.useGetTodosQuery(filterState, {
+  const selectedFilter = useSelector(selectFilter);
+  const { data, error, isLoading } = todosApi.useGetTodosQuery(selectedFilter, {
     pollingInterval: 5000,
     skipPollingIfUnfocused: true,
   });

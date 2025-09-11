@@ -1,12 +1,14 @@
 import React from 'react';
 
 import type { FormProps } from 'antd';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Alert, Button, Form, Input } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../../store/Auth/api';
 import type { AuthData } from '../../types/types';
 import { useDispatch } from 'react-redux';
 import { authTokenChange } from '../../store/Auth/auth.slice';
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
+import type { SerializedError } from '@reduxjs/toolkit/react';
 
 type FieldType = {
   login: string;
@@ -16,7 +18,7 @@ type FieldType = {
 
 const LoginForm: React.FC = () => {
   const [form] = Form.useForm();
-  const [loginUser, { isLoading }] = authApi.useLoginUserMutation();
+  const [loginUser, { isLoading, error }] = authApi.useLoginUserMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -38,12 +40,32 @@ const LoginForm: React.FC = () => {
           userRefreshToken: response.refreshToken,
         })
       );
+      localStorage.setItem('userRefreshToken', response.refreshToken);
       form.resetFields();
       navigate('/todos', { replace: true });
     } catch (error) {
       // TODO подумать, как правильнее обрабатывать ошибки
       console.error('Error:', error);
     }
+  };
+
+  const getErrorMessage = (
+    error: FetchBaseQueryError | SerializedError | undefined
+  ): string => {
+    if (error && 'originalStatus' in error) {
+      switch (error.originalStatus) {
+        case 400:
+          return 'Ошибка при обработке запроса. Пожалуйста, проверьте введённые данные.';
+        case 401:
+          return 'Неверный логин или пароль';
+        case 500:
+          return 'Ошибка при обработке запроса. Попробуйте повторить попытку позже.';
+
+        default:
+          return 'Что-то пошло не так. Попробуйте повторить попытку позже.';
+      }
+    }
+    return '';
   };
 
   return (
@@ -53,7 +75,6 @@ const LoginForm: React.FC = () => {
       labelAlign='left'
       initialValues={{ remember: true }}
       onFinish={handleSubmit}
-      // onFinishFailed={onFinishFailed}
       autoComplete='off'
       style={{ width: '100%', maxWidth: '420px', margin: '0' }}
       disabled={isLoading}
@@ -92,14 +113,11 @@ const LoginForm: React.FC = () => {
         <Input.Password style={{ width: '100%', maxWidth: '420px' }} />
       </Form.Item>
 
-      <Form.Item<FieldType>
-        wrapperCol={{ span: 20 }}
-        name='remember'
-        valuePropName='checked'
-        label={null}
-      >
-        <Checkbox>Запомнить меня</Checkbox>
-      </Form.Item>
+      {error && (
+        <Form.Item wrapperCol={{ span: 24 }} style={{ textAlign: 'center' }}>
+          <Alert message={getErrorMessage(error)} type='error' />
+        </Form.Item>
+      )}
 
       <Form.Item wrapperCol={{ span: 24 }} label={null}>
         <Button

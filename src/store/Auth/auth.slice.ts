@@ -21,14 +21,14 @@ const authSlice = createSlice({
         userRefreshToken: string;
       }>
     ) => {
-      // TODO убрать сайдэффекты в виде изменения localStorage из редьюсеров
-      localStorage.setItem('userRefreshToken', action.payload.userRefreshToken);
+      // перенесено в baseApiWithAuth и в компонент логина чтобы не было сайд эффектов
+      // localStorage.setItem('userRefreshToken', action.payload.userRefreshToken);
       state.userAccessToken = action.payload.userAccessToken;
       state.userRefreshToken = action.payload.userRefreshToken;
     },
     logoutUser: (state) => {
-      console.log('logout reducer activated');
-      localStorage.removeItem('userRefreshToken');
+      // перенесено в baseApiWithAuth чтобы не было сайд эффектов
+      // localStorage.removeItem('userRefreshToken');
       state.userAccessToken = null;
       state.userRefreshToken = null;
     },
