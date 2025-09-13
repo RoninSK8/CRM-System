@@ -26,7 +26,7 @@ const authSlice = createSlice({
       state.userAccessToken = action.payload.userAccessToken;
       state.userRefreshToken = action.payload.userRefreshToken;
     },
-    logoutUser: (state) => {
+    deleteAuthTokensFromState: (state) => {
       // перенесено в baseApiWithAuth чтобы не было сайд эффектов
       // localStorage.removeItem('userRefreshToken');
       state.userAccessToken = null;
@@ -40,6 +40,6 @@ export const selectAccessToken = (state: RootState) =>
 export const selectRefreshToken = (state: RootState) =>
   state.auth.userRefreshToken;
 
-export const { authTokenChange, logoutUser } = authSlice.actions;
+export const { authTokenChange, deleteAuthTokensFromState } = authSlice.actions;
 
 export default authSlice.reducer;

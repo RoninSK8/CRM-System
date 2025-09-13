@@ -55,3 +55,10 @@ export const todosApi = baseApi.injectEndpoints({
   }),
   overrideExisting: true,
 });
+
+export const {
+  useAddTodoMutation,
+  useDeleteTodoMutation,
+  useEditTodoMutation,
+  useGetTodosQuery,
+} = todosApi;

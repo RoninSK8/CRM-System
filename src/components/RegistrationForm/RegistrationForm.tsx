@@ -1,7 +1,7 @@
 import type { FormProps } from 'antd';
 import { Alert, Button, Form, Input, Result } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
-import { authApi } from '../../store/Auth/api';
+import { useRegisterUserMutation } from '../../store/Auth/api';
 import type { UserRegistration } from '../../types/types';
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import type { SerializedError } from '@reduxjs/toolkit/react';
@@ -18,9 +18,8 @@ const RegistrationForm: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [registerUser, { isLoading: isRegisteringUser, isSuccess, error }] =
-    authApi.useRegisterUserMutation();
+    useRegisterUserMutation();
 
-  console.log(isSuccess);
   const handleSubmit: FormProps<UserRegistration>['onFinish'] = async ({
     login,
     username,
@@ -86,6 +85,7 @@ const RegistrationForm: React.FC = () => {
   return (
     <>
       <Form
+        form={form}
         name='login'
         size='middle'
         labelAlign='left'

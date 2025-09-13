@@ -3,7 +3,7 @@ import React from 'react';
 import type { FormProps } from 'antd';
 import { Alert, Button, Form, Input } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
-import { authApi } from '../../store/Auth/api';
+import { useLoginUserMutation } from '../../store/Auth/api';
 import type { AuthData } from '../../types/types';
 import { useDispatch } from 'react-redux';
 import { authTokenChange } from '../../store/Auth/auth.slice';
@@ -18,7 +18,7 @@ type FieldType = {
 
 const LoginForm: React.FC = () => {
   const [form] = Form.useForm();
-  const [loginUser, { isLoading, error }] = authApi.useLoginUserMutation();
+  const [loginUser, { isLoading, error }] = useLoginUserMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -44,7 +44,6 @@ const LoginForm: React.FC = () => {
       form.resetFields();
       navigate('/todos', { replace: true });
     } catch (error) {
-      // TODO подумать, как правильнее обрабатывать ошибки
       console.error('Error:', error);
     }
   };
@@ -70,6 +69,7 @@ const LoginForm: React.FC = () => {
 
   return (
     <Form
+      form={form}
       name='login'
       size='middle'
       labelAlign='left'

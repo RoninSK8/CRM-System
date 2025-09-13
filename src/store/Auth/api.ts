@@ -6,6 +6,7 @@ import type {
   UserRegistration,
 } from '../../types/types';
 import { baseApi } from '../baseApi';
+import { deleteAuthTokensFromState } from './auth.slice';
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (create) => ({
@@ -41,6 +42,26 @@ export const authApi = baseApi.injectEndpoints({
         },
       }),
     }),
+    logoutUser: create.mutation<void, void>({
+      query: () => ({
+        url: 'user/logout',
+        method: 'POST',
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } finally {
+          dispatch(deleteAuthTokensFromState());
+        }
+      },
+    }),
   }),
   overrideExisting: true,
 });
+
+export const {
+  useLogoutUserMutation,
+  useLoginUserMutation,
+  useRegisterUserMutation,
+  useUpdateTokensMutation,
+} = authApi;

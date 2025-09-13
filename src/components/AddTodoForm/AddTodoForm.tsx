@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Alert, Button, Form, Input, type FormProps } from 'antd';
-import { todosApi } from '../../store/Todos/api';
+import { useAddTodoMutation } from '../../store/Todos/api';
 
 const AddTodoForm = () => {
   const [errorText, setErrorText] = useState<string>('');
   const [form] = Form.useForm();
 
-  const [addTodo, { isLoading: isAddingTodo }] = todosApi.useAddTodoMutation();
+  const [addTodo, { isLoading: isAddingTodo }] = useAddTodoMutation();
 
   const onSubmit: FormProps<{ title: string }>['onFinish'] = async (values) => {
     const todoTitle = values.title;

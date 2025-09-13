@@ -13,7 +13,10 @@ import {
   type FormProps,
 } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { todosApi } from '../../store/Todos/api';
+import {
+  useDeleteTodoMutation,
+  useEditTodoMutation,
+} from '../../store/Todos/api';
 
 interface TodoItemProps {
   todo: Todo;
@@ -24,9 +27,8 @@ const TodoItem = ({ todo }: TodoItemProps) => {
   const [errorText, setErrorText] = useState<string>('');
   const [form] = Form.useForm();
 
-  const [deleteTodo] = todosApi.useDeleteTodoMutation();
-  const [editTodo, { isLoading: isSavingEdit }] =
-    todosApi.useEditTodoMutation();
+  const [deleteTodo] = useDeleteTodoMutation();
+  const [editTodo, { isLoading: isSavingEdit }] = useEditTodoMutation();
 
   function handleChangeStatus(e: CheckboxChangeEvent) {
     const isChecked = e.target.checked;

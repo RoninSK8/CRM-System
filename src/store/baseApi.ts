@@ -6,7 +6,7 @@ import {
   type FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
 import type { RootState } from './store';
-import { authTokenChange, logoutUser } from './Auth/auth.slice';
+import { authTokenChange, deleteAuthTokensFromState } from './Auth/auth.slice';
 import type { Token } from '../types/types';
 
 const baseUrl = import.meta.env.VITE_DATABASE_URL;
@@ -76,7 +76,7 @@ export const baseQueryWithReauth: BaseQueryFn<
       // Пробуем заново изначальный запрос
       result = await baseQuery(args, store, extraOptions);
     } else {
-      store.dispatch(logoutUser());
+      store.dispatch(deleteAuthTokensFromState());
       localStorage.removeItem('userRefreshToken');
       window.location.href = '/auth/login';
     }

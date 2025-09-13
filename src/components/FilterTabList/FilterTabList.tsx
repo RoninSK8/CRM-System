@@ -2,12 +2,12 @@ import type { ToDoStatus } from '../../types/types';
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 import { selectFilter, setFilter } from '../../store/Todos/filter.slice';
-import { todosApi } from '../../store/Todos/api';
 import { useDispatch, useSelector } from 'react-redux';
+import { useGetTodosQuery } from '../../store/Todos/api';
 
 const FilterTabList = () => {
   const dispatch = useDispatch();
-  const { data } = todosApi.useGetTodosQuery('all', {
+  const { data } = useGetTodosQuery('all', {
     pollingInterval: 5000,
     skipPollingIfUnfocused: true,
   });
