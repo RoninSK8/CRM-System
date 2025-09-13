@@ -1,50 +1,56 @@
-import type { TodoInfo, ToDoStatus } from '../../types/todo';
+import type { ToDoStatus } from '../../types/types';
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
-import { memo } from 'react';
+import { selectFilter, setFilter } from '../../store/Todos/filter.slice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useGetTodosQuery } from '../../store/Todos/api';
 
-type FilterTabListProps = {
-  filter: ToDoStatus;
-  setFilter: (arg: ToDoStatus) => void;
-  todoInfo: TodoInfo;
+const FilterTabList = () => {
+  const dispatch = useDispatch();
+  const { data } = useGetTodosQuery('all', {
+    pollingInterval: 5000,
+    skipPollingIfUnfocused: true,
+  });
+  const todoInfo = data?.info ?? {
+    all: 0,
+    completed: 0,
+    inWork: 0,
+  };
+
+  const items: TabsProps['items'] = [
+    {
+      key: 'all',
+      label: `Все (${todoInfo.all})`,
+    },
+    {
+      key: 'inWork',
+      label: `В работе (${todoInfo.inWork})`,
+    },
+    {
+      key: 'completed',
+      label: `Сделано (${todoInfo.completed})`,
+    },
+  ];
+
+  const selectedFilter = useSelector(selectFilter);
+
+  // antd передаёт стрингу, поэтому кастую к ToDoStatus и делаю тайп гард
+  const handleChange = (key: ToDoStatus) => {
+    if (key === 'all' || key === 'inWork' || key === 'completed') {
+      dispatch(setFilter({ selectedFilter: key }));
+    }
+  };
+
+  return (
+    <Tabs
+      defaultActiveKey='all'
+      activeKey={selectedFilter}
+      items={items}
+      onChange={(activeKey) => handleChange(activeKey as ToDoStatus)}
+      centered={true}
+      indicator={{ size: 0 }}
+      size='large'
+    />
+  );
 };
-
-const FilterTabList = memo(
-  ({ filter, setFilter, todoInfo }: FilterTabListProps) => {
-    const items: TabsProps['items'] = [
-      {
-        key: 'all',
-        label: `Все (${todoInfo.all})`,
-      },
-      {
-        key: 'inWork',
-        label: `В работе (${todoInfo.inWork})`,
-      },
-      {
-        key: 'completed',
-        label: `Сделано (${todoInfo.completed})`,
-      },
-    ];
-
-    // antd передаёт стрингу, поэтому кастую к ToDoStatus и делаю тайп гард
-    const handleChange = (key: ToDoStatus) => {
-      if (key === 'all' || key === 'inWork' || key === 'completed') {
-        setFilter(key);
-      }
-    };
-
-    return (
-      <Tabs
-        defaultActiveKey='all'
-        activeKey={filter}
-        items={items}
-        onChange={(activeKey) => handleChange(activeKey as ToDoStatus)}
-        centered={true}
-        indicator={{ size: 0 }}
-        size='large'
-      />
-    );
-  }
-);
-
 export default FilterTabList;

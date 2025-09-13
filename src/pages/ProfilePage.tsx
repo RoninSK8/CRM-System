@@ -1,5 +1,7 @@
+import Profile from '../components/Profile/Profile';
+
 function ProfilePage() {
-  return <div>Привет</div>;
+  return <Profile />;
 }
 
 export default ProfilePage;
