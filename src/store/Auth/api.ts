@@ -1,3 +1,4 @@
+import { tokenService } from '../../services/tokenService';
 import type {
   AuthData,
   Profile,
@@ -6,7 +7,6 @@ import type {
   UserRegistration,
 } from '../../types/types';
 import { baseApi } from '../baseApi';
-import { deleteAuthTokensFromState } from './auth.slice';
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (create) => ({
@@ -47,11 +47,12 @@ export const authApi = baseApi.injectEndpoints({
         url: 'user/logout',
         method: 'POST',
       }),
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { queryFulfilled }) {
         try {
           await queryFulfilled;
         } finally {
-          dispatch(deleteAuthTokensFromState());
+          tokenService.clearAccessToken();
+          localStorage.removeItem('refreshToken');
         }
       },
     }),

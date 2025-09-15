@@ -15,7 +15,6 @@ const AddTodoForm = () => {
       await addTodo(todoTitle);
       form.resetFields();
     } catch (error) {
-      // TODO подумать, как правильнее обрабатывать ошибки
       console.error('Error:', error);
       setErrorText('Ошибка при добавлении задачи.');
     }

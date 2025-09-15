@@ -1,6 +1,8 @@
 import { Button, Layout, Menu, theme, type MenuProps } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useLogoutUserMutation } from '../store/Auth/api';
+import { setIsAuthorized } from '../store/Auth/auth.slice';
+import { useDispatch } from 'react-redux';
 const { Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -30,6 +32,7 @@ const siderStyle: React.CSSProperties = {
 const HomePageLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [logoutUser, { isLoading: isLoggingOutUser }] = useLogoutUserMutation();
 
   const {
@@ -42,7 +45,7 @@ const HomePageLayout = () => {
 
   const handleLogoutClick = () => {
     logoutUser();
-    localStorage.removeItem('userRefreshToken');
+    dispatch(setIsAuthorized({ isAuthorized: false }));
     navigate('/auth/login', { replace: true });
   };
 

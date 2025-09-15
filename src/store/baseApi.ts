@@ -5,19 +5,20 @@ import {
   type FetchArgs,
   type FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
-import type { RootState } from './store';
-import { authTokenChange, deleteAuthTokensFromState } from './Auth/auth.slice';
 import type { Token } from '../types/types';
+import { tokenService } from '../services/tokenService';
+import { setIsAuthorized } from './Auth/auth.slice';
 
 const baseUrl = import.meta.env.VITE_DATABASE_URL;
 
 export const baseQuery = fetchBaseQuery({
-  baseUrl: baseUrl,
-  prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).auth.userAccessToken;
+  baseUrl,
+  prepareHeaders: (headers) => {
+    const accessToken = tokenService.getAccessToken()?.accessToken;
+    console.log('Base query');
 
-    if (token) {
-      headers.set('authorization', `Bearer ${token}`);
+    if (accessToken) {
+      headers.set('authorization', `Bearer ${accessToken}`);
     }
     return headers;
   },
@@ -49,7 +50,7 @@ export const baseQueryWithReauth: BaseQueryFn<
     'originalStatus' in result.error &&
     result.error.originalStatus === 401
   ) {
-    const refreshToken = localStorage.getItem('userRefreshToken');
+    const refreshToken = localStorage.getItem('refreshToken');
     if (!refreshToken) {
       return result;
     }
@@ -66,18 +67,18 @@ export const baseQueryWithReauth: BaseQueryFn<
 
     if (refreshResult.data) {
       const tokenResponse = refreshResult.data as Token;
-      store.dispatch(
-        authTokenChange({
-          userAccessToken: tokenResponse.accessToken,
-          userRefreshToken: tokenResponse.refreshToken,
-        })
-      );
-      localStorage.setItem('userRefreshToken', tokenResponse.refreshToken);
+      tokenService.setAccessToken({ accessToken: tokenResponse.accessToken });
+      localStorage.setItem('refreshToken', tokenResponse.refreshToken);
+
+      store.dispatch(setIsAuthorized({ isAuthorized: true }));
+
       // Пробуем заново изначальный запрос
       result = await baseQuery(args, store, extraOptions);
     } else {
-      store.dispatch(deleteAuthTokensFromState());
-      localStorage.removeItem('userRefreshToken');
+      console.log('logging out from reauth query');
+      tokenService.clearAccessToken();
+      localStorage.removeItem('refreshToken');
+      store.dispatch(setIsAuthorized({ isAuthorized: false }));
       window.location.href = '/auth/login';
     }
   }

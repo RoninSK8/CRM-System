@@ -6,9 +6,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLoginUserMutation } from '../../store/Auth/api';
 import type { AuthData } from '../../types/types';
 import { useDispatch } from 'react-redux';
-import { authTokenChange } from '../../store/Auth/auth.slice';
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import type { SerializedError } from '@reduxjs/toolkit/react';
+import { tokenService } from '../../services/tokenService';
+import { setIsAuthorized } from '../../store/Auth/auth.slice';
 
 type FieldType = {
   login: string;
@@ -33,14 +34,9 @@ const LoginForm: React.FC = () => {
 
     try {
       const response = await loginUser(loginData).unwrap();
-
-      dispatch(
-        authTokenChange({
-          userAccessToken: response.accessToken,
-          userRefreshToken: response.refreshToken,
-        })
-      );
-      localStorage.setItem('userRefreshToken', response.refreshToken);
+      dispatch(setIsAuthorized({ isAuthorized: true }));
+      tokenService.setAccessToken({ accessToken: response.accessToken });
+      localStorage.setItem('refreshToken', response.refreshToken);
       form.resetFields();
       navigate('/todos', { replace: true });
     } catch (error) {

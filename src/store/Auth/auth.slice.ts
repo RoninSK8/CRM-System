@@ -1,45 +1,33 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 import type { RootState } from '../store';
 
 type AuthState = {
-  userAccessToken: string | null;
-  userRefreshToken: string | null;
+  isAuthorized: boolean;
+  isLoading: boolean;
+};
+
+const initialState: AuthState = {
+  isAuthorized: false,
+  isLoading: false,
 };
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    userAccessToken: null,
-    userRefreshToken: localStorage.getItem('refreshToken'),
-  } as AuthState,
+  initialState,
   reducers: {
-    authTokenChange: (
-      state,
-      action: PayloadAction<{
-        userAccessToken: string;
-        userRefreshToken: string;
-      }>
-    ) => {
-      // перенесено в baseApiWithAuth и в компонент логина чтобы не было сайд эффектов
-      // localStorage.setItem('userRefreshToken', action.payload.userRefreshToken);
-      state.userAccessToken = action.payload.userAccessToken;
-      state.userRefreshToken = action.payload.userRefreshToken;
+    setIsAuthorized: (state, action) => {
+      state.isAuthorized = action.payload.isAuthorized;
     },
-    deleteAuthTokensFromState: (state) => {
-      // перенесено в baseApiWithAuth чтобы не было сайд эффектов
-      // localStorage.removeItem('userRefreshToken');
-      state.userAccessToken = null;
-      state.userRefreshToken = null;
+    setIsLoading: (state, action) => {
+      state.isLoading = action.payload.isLoading;
     },
   },
 });
 
-export const selectAccessToken = (state: RootState) =>
-  state.auth.userAccessToken;
-export const selectRefreshToken = (state: RootState) =>
-  state.auth.userRefreshToken;
+export const selectIsAuthorized = (state: RootState) => state.auth.isAuthorized;
+export const selectIsLoading = (state: RootState) => state.auth.isLoading;
 
-export const { authTokenChange, deleteAuthTokensFromState } = authSlice.actions;
+export const { setIsAuthorized, setIsLoading } = authSlice.actions;
 
 export default authSlice.reducer;

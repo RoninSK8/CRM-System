@@ -41,6 +41,9 @@ export interface AuthData {
 export interface RefreshToken {
   refreshToken: string;
 }
+export interface AccessToken {
+  accessToken: string;
+}
 
 export interface Profile {
   id: number;
