@@ -1,11 +1,13 @@
-import { Layout, Menu, theme, type MenuProps } from 'antd';
-
-import { Outlet, useLocation, useNavigate } from 'react-router';
+import { Button, Layout, Menu, theme, type MenuProps } from 'antd';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useLogoutUserMutation } from '../store/Auth/api';
+import { setIsAuthorized } from '../store/Auth/auth.slice';
+import { useDispatch } from 'react-redux';
 const { Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-const items: MenuItem[] = [
+const menuItems: MenuItem[] = [
   {
     key: '/todos',
     label: 'Список задач',
@@ -30,29 +32,61 @@ const siderStyle: React.CSSProperties = {
 const HomePageLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [logoutUser, { isLoading: isLoggingOutUser }] = useLogoutUserMutation();
 
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const onClick: MenuProps['onClick'] = (e) => {
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
     navigate(e.key);
+  };
+
+  const handleLogoutClick = () => {
+    logoutUser();
+    dispatch(setIsAuthorized({ isAuthorized: false }));
+    navigate('/auth/login', { replace: true });
   };
 
   return (
     <Layout>
-      <Sider style={siderStyle} breakpoint="lg" collapsedWidth="0">
-        <div className="demo-logo-vertical" />
-        <Menu
+      <Sider style={siderStyle} breakpoint='sm' collapsedWidth='0'>
+        {/* антд оборачивает контент сайдера в див, поэтому не получается задать justifyContent: 'space-between' саайдеру напрямую, поэтому обернул меню и кнопку логаута в див с флексом, чтобы отнести кнопку логаута вниз */}
+        <div
           style={{
-            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            justifyContent: 'space-between',
           }}
-          theme="dark"
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={items}
-          onSelect={onClick}
-        />
+        >
+          <Menu
+            style={{
+              padding: 24,
+            }}
+            theme='dark'
+            mode='inline'
+            selectedKeys={[location.pathname]}
+            items={menuItems}
+            onSelect={handleMenuClick}
+            inlineIndent={16}
+          />
+
+          <Button
+            onClick={handleLogoutClick}
+            disabled={isLoggingOutUser}
+            style={{
+              width: '125px',
+              display: 'block',
+              margin: '24px auto',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+            }}
+          >
+            Выйти
+          </Button>
+        </div>
       </Sider>
       <Layout>
         {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}

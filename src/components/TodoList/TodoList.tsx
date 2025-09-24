@@ -1,30 +1,33 @@
 import TodoItem from '../TodoItem/TodoItem';
-import type { Todo } from '../../types/todo';
-import { Alert } from 'antd';
-import { memo } from 'react';
+import { Alert, Spin } from 'antd';
+import { selectFilter } from '../../store/Todos/filter.slice';
+import { useSelector } from 'react-redux';
+import { useGetTodosQuery } from '../../store/Todos/api';
 
-interface TodoListProps {
-  todos: Todo[];
-  error: string;
-  fetchTodos: () => void;
-}
+const TodoList = () => {
+  const selectedFilter = useSelector(selectFilter);
+  const { data, error, isLoading } = useGetTodosQuery(selectedFilter, {
+    pollingInterval: 5000,
+    skipPollingIfUnfocused: true,
+  });
+  const todos = data?.data;
 
-const TodoList = memo(({ error, todos, fetchTodos }: TodoListProps) => {
   return (
     <>
       {error && (
         <Alert message={'Ошибка загрузки данных...'} type='error' showIcon />
       )}
 
-      {todos.length ? (
+      {todos && todos.length ? (
         todos.map((todo) => {
-          return <TodoItem todo={todo} fetchTodos={fetchTodos} />;
+          return <TodoItem key={todo.id} todo={todo} />;
         })
       ) : (
         <p>Список задач пуст...</p>
       )}
+      {isLoading && <Spin />}
     </>
   );
-});
+};
 
 export default TodoList;
