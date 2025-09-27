@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import type { FormProps } from 'antd';
 import { Alert, Button, Form, Input } from 'antd';
@@ -10,6 +10,8 @@ import type { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import type { SerializedError } from '@reduxjs/toolkit/react';
 import { tokenService } from '../../services/tokenService';
 import { setIsAuthorized } from '../../store/Auth/auth.slice';
+import { setProfile } from '../../store/User/user.slice';
+import { useGetProfileQuery } from '../../store/User/api';
 
 type FieldType = {
   login: string;
@@ -19,7 +21,16 @@ type FieldType = {
 
 const LoginForm: React.FC = () => {
   const [form] = Form.useForm();
-  const [loginUser, { isLoading, error }] = useLoginUserMutation();
+  const [loginUser, { isLoading: isLoadingLogin, error }] =
+    useLoginUserMutation();
+  // триггер фетч юзер даты не при рендере, а после логина за счёт установки параметра skip
+  const [skip, setSkip] = useState<boolean>(true);
+  const { data: profile, isLoading: isLoadingProfile } = useGetProfileQuery(
+    undefined,
+    {
+      skip,
+    }
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -34,15 +45,28 @@ const LoginForm: React.FC = () => {
 
     try {
       const response = await loginUser(loginData).unwrap();
+
       dispatch(setIsAuthorized({ isAuthorized: true }));
       tokenService.setAccessToken({ accessToken: response.accessToken });
       localStorage.setItem('refreshToken', response.refreshToken);
+
+      // триггер фетч юзер даты за счет установки скип в false
+      setSkip(false);
+
       form.resetFields();
       navigate('/todos', { replace: true });
     } catch (error) {
       console.error('Error:', error);
     }
   };
+
+  useEffect(() => {
+    if (!skip && profile) {
+      console.log('setting user profile from useeffect', profile);
+
+      dispatch(setProfile(profile));
+    }
+  }, [dispatch, profile, skip]);
 
   const getErrorMessage = (
     error: FetchBaseQueryError | SerializedError | undefined
@@ -73,7 +97,7 @@ const LoginForm: React.FC = () => {
       onFinish={handleSubmit}
       autoComplete='off'
       style={{ width: '100%', maxWidth: '420px', margin: '0' }}
-      disabled={isLoading}
+      disabled={isLoadingLogin || isLoadingProfile}
     >
       <Form.Item wrapperCol={{ span: 24 }} style={{ textAlign: 'center' }}>
         <h3 className='ant-form-text'>Войдите в свой аккаунт</h3>

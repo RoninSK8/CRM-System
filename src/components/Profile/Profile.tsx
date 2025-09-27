@@ -10,7 +10,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (profile) {
-      dispatch(setProfile({ userProfile: profile }));
+      dispatch(setProfile(profile));
     }
   }, [dispatch, profile]);
 

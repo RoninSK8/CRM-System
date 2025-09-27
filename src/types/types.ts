@@ -70,4 +70,14 @@ export interface Token {
   refreshToken: string;
 }
 
-type Role = 'ADMIN' | 'USER' | 'MODERATOR';
+export type Role = 'ADMIN' | 'USER' | 'MODERATOR';
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  date: string; // ISO date string
+  isBlocked: boolean;
+  roles: Role[];
+  phoneNumber: string;
+}

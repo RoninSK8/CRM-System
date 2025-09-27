@@ -8,6 +8,7 @@ import {
 import type { Token } from '../types/types';
 import { tokenService } from '../services/tokenService';
 import { setIsAuthorized } from './Auth/auth.slice';
+import { clearUserProfile } from './User/user.slice';
 
 const baseUrl = import.meta.env.VITE_DATABASE_URL;
 
@@ -79,6 +80,7 @@ export const baseQueryWithReauth: BaseQueryFn<
       tokenService.clearAccessToken();
       localStorage.removeItem('refreshToken');
       store.dispatch(setIsAuthorized({ isAuthorized: false }));
+      store.dispatch(clearUserProfile());
       window.location.href = '/auth/login';
     }
   }

@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { Profile } from '../../types/types';
 import type { AppState } from '../redux';
@@ -12,17 +12,21 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: 'filter',
+  name: 'user',
   initialState,
   reducers: {
-    setProfile: (state, action) => {
-      state.userProfile = action.payload.userProfile;
+    setProfile: (state, action: PayloadAction<Profile>) => {
+      state.userProfile = action.payload;
+    },
+    clearUserProfile: (state) => {
+      console.log('clearing user profile from user slice reducer');
+      state.userProfile = null;
     },
   },
 });
 
 export const selectUserProfile = (state: AppState) => state.user.userProfile;
 
-export const { setProfile } = userSlice.actions;
+export const { setProfile, clearUserProfile } = userSlice.actions;
 
 export default userSlice.reducer;
