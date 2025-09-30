@@ -62,8 +62,6 @@ const LoginForm: React.FC = () => {
 
   useEffect(() => {
     if (!skip && profile) {
-      console.log('setting user profile from useeffect', profile);
-
       dispatch(setProfile(profile));
     }
   }, [dispatch, profile, skip]);

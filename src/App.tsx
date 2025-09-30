@@ -15,6 +15,7 @@ import { store } from './store/store';
 import ProtectedRoute from './components/ProtectedRoute';
 import UsersPage from './pages/UsersPage';
 import RequireRole from './components/RequireRole';
+import UserPage from './pages/UserPage';
 
 const router = createBrowserRouter([
   {
@@ -39,7 +40,10 @@ const router = createBrowserRouter([
           {
             path: '/users',
             element: <RequireRole />,
-            children: [{ index: true, element: <UsersPage /> }],
+            children: [
+              { index: true, element: <UsersPage /> },
+              { path: ':id', element: <UserPage /> },
+            ],
           },
         ],
       },

@@ -19,7 +19,6 @@ const userSlice = createSlice({
       state.userProfile = action.payload;
     },
     clearUserProfile: (state) => {
-      console.log('clearing user profile from user slice reducer');
       state.userProfile = null;
     },
   },

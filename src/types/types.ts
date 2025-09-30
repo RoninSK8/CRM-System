@@ -70,8 +70,17 @@ export interface Token {
   refreshToken: string;
 }
 
+export interface UserFilters {
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  isBlocked?: boolean;
+  limit?: number; // сколько на странице
+  page?: number; // страницу
+}
 export type Role = 'ADMIN' | 'USER' | 'MODERATOR';
 
+// Интерфейс пользователя
 export interface User {
   id: number;
   username: string;
@@ -80,4 +89,21 @@ export interface User {
   isBlocked: boolean;
   roles: Role[];
   phoneNumber: string;
+}
+// Интерфейс метаинформации
+
+export interface GetUsersMetaResponse<T> {
+  data: T[];
+  meta: {
+    totalAmount: number;
+    sortBy: string;
+    sortOrder: 'asc' | 'desc';
+  };
+}
+
+// Интерфейс для обновления данных пользователя
+export interface UserRequest {
+  username?: string;
+  email?: string;
+  phoneNumber?: string;
 }
