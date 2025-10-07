@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button, Checkbox, Modal } from 'antd';
 import type { Role } from '../../types/types';
 import { useUpdateUserRolesMutation } from '../../store/Users/api';

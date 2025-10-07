@@ -23,6 +23,9 @@ import { Link } from 'react-router-dom';
 import { DeleteOutlined, DownOutlined } from '@ant-design/icons';
 import type { MenuItemType } from 'antd/es/menu/interface';
 import UserRolesModal from '../components/UserRolesModal/UserRolesModal';
+import { useGetProfileQuery } from '../store/User/api';
+import { useSelector } from 'react-redux';
+import { selectUserProfile } from '../store/User/user.slice';
 
 const { confirm } = Modal;
 
@@ -56,6 +59,14 @@ const UsersPage: React.FC = () => {
   const [blockUser, { isLoading: isBlockingUser }] = useBlockUserMutation();
   const [unblockUser, { isLoading: isUnblockingUser }] =
     useUnblockUserMutation();
+
+  useGetProfileQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const userProfile = useSelector(selectUserProfile);
+  const roles = userProfile?.roles;
+  const isAdmin = roles?.includes('ADMIN');
 
   // TODO прикрутить дебаунс на поиск
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -98,6 +109,11 @@ const UsersPage: React.FC = () => {
       title: 'Дата регистрации',
       dataIndex: 'date',
       key: 'date',
+      render: (_, { date }) => {
+        const dateObject = new Date(date);
+        const formattedDate = dateObject.toLocaleDateString('ru-RU');
+        return formattedDate;
+      },
     },
     {
       title: 'Статус блокировки',
@@ -195,6 +211,7 @@ const UsersPage: React.FC = () => {
     },
     {
       key: 'editRole',
+      hidden: !isAdmin,
       render: (_, { id, roles }) => {
         return <UserRolesModal id={id} roles={roles} />;
       },
@@ -216,6 +233,7 @@ const UsersPage: React.FC = () => {
     {
       dataIndex: 'id',
       key: 'id',
+      hidden: !isAdmin,
       render: (id) => (
         <Button
           disabled={isDeletingUser}
@@ -288,45 +306,47 @@ const UsersPage: React.FC = () => {
         onChange={handleSearchChange}
         enterButton
       />
-      <div style={{ margin: '16px 0' }}>
-        <Dropdown
-          menu={{
-            items: filterByBlockedStatusMenuItems,
-            selectable: true,
-            defaultSelectedKeys: ['1'],
-            onSelect: ({ key }) => {
-              setSelectedIsBlockedFilter(
-                (filterByBlockedStatusMenuItems[Number(key) - 1]
-                  ?.label as string) ?? 'Все пользователи'
-              );
+      {isAdmin && (
+        <div style={{ margin: '16px 0' }}>
+          <Dropdown
+            menu={{
+              items: filterByBlockedStatusMenuItems,
+              selectable: true,
+              defaultSelectedKeys: ['1'],
+              onSelect: ({ key }) => {
+                setSelectedIsBlockedFilter(
+                  (filterByBlockedStatusMenuItems[Number(key) - 1]
+                    ?.label as string) ?? 'Все пользователи'
+                );
 
-              switch (key) {
-                case '1':
-                  setIsBlockedFilterStatus(undefined);
-                  break;
+                switch (key) {
+                  case '1':
+                    setIsBlockedFilterStatus(undefined);
+                    break;
 
-                case '2':
-                  setIsBlockedFilterStatus(true);
-                  break;
+                  case '2':
+                    setIsBlockedFilterStatus(true);
+                    break;
 
-                case '3':
-                  setIsBlockedFilterStatus(false);
-                  break;
+                  case '3':
+                    setIsBlockedFilterStatus(false);
+                    break;
 
-                default:
-                  break;
-              }
-            },
-          }}
-        >
-          <Typography.Link>
-            <Space>
-              {selectedIsBlockedFilter}
-              <DownOutlined />
-            </Space>
-          </Typography.Link>
-        </Dropdown>
-      </div>
+                  default:
+                    break;
+                }
+              },
+            }}
+          >
+            <Typography.Link>
+              <Space>
+                {selectedIsBlockedFilter}
+                <DownOutlined />
+              </Space>
+            </Typography.Link>
+          </Dropdown>
+        </div>
+      )}
       <Table<User>
         size='small'
         columns={columns}
