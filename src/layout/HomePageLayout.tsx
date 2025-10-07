@@ -119,8 +119,7 @@ const HomePageLayout = () => {
         </div>
       </Sider>
       <Layout>
-        {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
-        <Content style={{ margin: '24px 16px 0' }}>
+        <Content>
           <div
             style={{
               padding: 24,
@@ -132,7 +131,6 @@ const HomePageLayout = () => {
             <Outlet />
           </div>
         </Content>
-        {/* <Footer style={{ textAlign: 'center' }}></Footer> */}
       </Layout>
     </Layout>
   );

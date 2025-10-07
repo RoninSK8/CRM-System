@@ -3,11 +3,17 @@ import type {
   User,
   UserFilters,
   UserRequest,
+  UserRolesRequest,
 } from '../../types/types';
 import { baseApi } from '../baseApi';
 
 type UpdateUserArgs = {
   data: UserRequest;
+  id: number;
+};
+
+type UpdateUserRoleArgs = {
+  data: UserRolesRequest;
   id: number;
 };
 
@@ -49,6 +55,28 @@ export const usersApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
+    blockUser: create.mutation<User, number>({
+      query: (id) => ({
+        url: `admin/users/${id}/block`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['User'],
+    }),
+    unblockUser: create.mutation<User, number>({
+      query: (id) => ({
+        url: `admin/users/${id}/unblock`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['User'],
+    }),
+    updateUserRoles: create.mutation<User, UpdateUserRoleArgs>({
+      query: ({ id, data }) => ({
+        url: `admin/users/${id}/rights`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
   overrideExisting: true,
 });
@@ -58,4 +86,7 @@ export const {
   useGetUserQuery,
   useEditUserMutation,
   useDeleteUserMutation,
+  useBlockUserMutation,
+  useUnblockUserMutation,
+  useUpdateUserRolesMutation,
 } = usersApi;
