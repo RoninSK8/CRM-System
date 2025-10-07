@@ -45,12 +45,12 @@ export const todosApi = baseApi.injectEndpoints({
         body: todoData,
       }),
       // Инвалидируем теги для того, чтобы происходил рефетч после мутаций
-      invalidatesTags: (_, __, arg) => [{ type: 'Todo', id: arg.id }],
+      invalidatesTags: ['Todo'],
     }),
     deleteTodo: create.mutation<void, number>({
       query: (id) => ({ method: 'DELETE', url: `/todos/${id}` }),
       // Инвалидируем тег для обновления списка после удаления тудухи
-      invalidatesTags: (_, __, arg) => [{ type: 'Todo', id: arg }],
+      invalidatesTags: ['Todo'],
     }),
   }),
   overrideExisting: true,
