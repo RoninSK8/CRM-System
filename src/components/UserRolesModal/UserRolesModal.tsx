@@ -12,7 +12,7 @@ interface UserRolesModalProps {
 }
 
 const UserRolesModal = ({ id, roles }: UserRolesModalProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editRolesCheckboxValues, setEditRolesCheckboxValues] = useState<
     Role[]
   >([]);

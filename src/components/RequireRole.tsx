@@ -11,16 +11,18 @@ const RequireRole = () => {
     refetchOnMountOrArgChange: true,
   });
 
+  // поменял на более удобную проверку, если ролей будет больше
+  const requiredRoles = ['ADMIN', 'MODERATOR'];
+
   const userProfile = useSelector(selectUserProfile);
   const roles = userProfile?.roles;
-  const isAdminOrModerator =
-    roles?.includes('ADMIN') || roles?.includes('MODERATOR');
+  const isRequiredRole = roles?.some((role) => requiredRoles.includes(role));
 
   if (isProfileFetching) {
     return <Spin />;
   }
 
-  return isAdminOrModerator ? (
+  return isRequiredRole ? (
     <Outlet />
   ) : (
     <Navigate to='/' state={{ from: location }} replace />
