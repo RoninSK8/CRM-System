@@ -19,12 +19,11 @@ const UserPage = () => {
     }
 
     const newUserData: UserRequest = {};
-    for (const key in formData) {
-      if (
-        formData[key as keyof UserRequest] !== user[key as keyof UserRequest]
-      ) {
-        newUserData[key as keyof UserRequest] =
-          formData[key as keyof UserRequest];
+
+    let key: keyof UserRequest;
+    for (key in formData) {
+      if (formData[key] !== user[key]) {
+        newUserData[key] = formData[key];
       }
     }
 

@@ -4,7 +4,7 @@ import { setProfile } from './user.slice';
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (create) => ({
-    getProfile: create.query<Profile, void>({
+    getProfile: create.query<Profile, void | null>({
       query: () => ({
         url: 'user/profile',
         method: 'GET',

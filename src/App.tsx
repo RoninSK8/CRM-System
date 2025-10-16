@@ -39,7 +39,7 @@ const router = createBrowserRouter([
           },
           {
             path: '/users',
-            element: <RequireRole />,
+            element: <RequireRole requiredRoles={['ADMIN', 'MODERATOR']} />,
             children: [
               { index: true, element: <UsersPage /> },
               { path: ':id', element: <UserPage /> },

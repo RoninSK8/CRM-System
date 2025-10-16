@@ -25,7 +25,7 @@ import type { MenuItemType } from 'antd/es/menu/interface';
 import UserRolesModal from '../components/UserRolesModal/UserRolesModal';
 import { useGetProfileQuery } from '../store/User/api';
 import { useSelector } from 'react-redux';
-import { selectUserProfile } from '../store/User/user.slice';
+import { selectUserHasRequiredRole } from '../store/User/user.slice';
 
 const { confirm } = Modal;
 
@@ -60,13 +60,12 @@ const UsersPage: React.FC = () => {
   const [unblockUser, { isLoading: isUnblockingUser }] =
     useUnblockUserMutation();
 
-  useGetProfileQuery(undefined, {
+  useGetProfileQuery(null, {
     refetchOnMountOrArgChange: true,
   });
 
-  const userProfile = useSelector(selectUserProfile);
-  const roles = userProfile?.roles;
-  const isAdmin = roles?.includes('ADMIN');
+  const hasRole = useSelector(selectUserHasRequiredRole);
+  const isAdmin = hasRole(['ADMIN']);
 
   // TODO прикрутить дебаунс на поиск
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {

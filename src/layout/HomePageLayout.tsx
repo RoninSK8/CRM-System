@@ -3,7 +3,10 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useLogoutUserMutation } from '../store/Auth/api';
 import { setIsAuthorized } from '../store/Auth/auth.slice';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearUserProfile, selectUserProfile } from '../store/User/user.slice';
+import {
+  clearUserProfile,
+  selectUserHasRequiredRole,
+} from '../store/User/user.slice';
 import { useGetProfileQuery, userApi } from '../store/User/api';
 const { Content, Sider } = Layout;
 
@@ -52,14 +55,12 @@ const HomePageLayout = () => {
   const dispatch = useDispatch();
   const [logoutUser, { isLoading: isLoggingOutUser }] = useLogoutUserMutation();
 
-  useGetProfileQuery(undefined, {
+  useGetProfileQuery(null, {
     refetchOnMountOrArgChange: true,
   });
 
-  const userProfile = useSelector(selectUserProfile);
-  const roles = userProfile?.roles;
-  const isAdminOrModerator =
-    roles?.includes('ADMIN') || roles?.includes('MODERATOR');
+  const hasRole = useSelector(selectUserHasRequiredRole);
+  const isAdminOrModerator = hasRole(['ADMIN', 'MODERATOR']);
 
   const {
     token: { colorBgContainer, borderRadiusLG },

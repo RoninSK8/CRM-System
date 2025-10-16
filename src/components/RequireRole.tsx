@@ -1,28 +1,28 @@
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { selectUserProfile } from '../store/User/user.slice';
+import { selectUserHasRequiredRole } from '../store/User/user.slice';
 import { useGetProfileQuery } from '../store/User/api';
 import { Spin } from 'antd';
+import type { Role } from '../types/types';
 
-const RequireRole = () => {
+type RequireRoleProps = {
+  requiredRoles: Role[];
+};
+const RequireRole = ({ requiredRoles }: RequireRoleProps) => {
   const location = useLocation();
 
-  const { isLoading: isProfileFetching } = useGetProfileQuery(undefined, {
+  const { isLoading: isProfileFetching } = useGetProfileQuery(null, {
     refetchOnMountOrArgChange: true,
   });
 
-  // поменял на более удобную проверку, если ролей будет больше
-  const requiredRoles = ['ADMIN', 'MODERATOR'];
-
-  const userProfile = useSelector(selectUserProfile);
-  const roles = userProfile?.roles;
-  const isRequiredRole = roles?.some((role) => requiredRoles.includes(role));
+  const hasRole = useSelector(selectUserHasRequiredRole);
+  const userHasRequiredRole = hasRole(requiredRoles);
 
   if (isProfileFetching) {
     return <Spin />;
   }
 
-  return isRequiredRole ? (
+  return userHasRequiredRole ? (
     <Outlet />
   ) : (
     <Navigate to='/' state={{ from: location }} replace />

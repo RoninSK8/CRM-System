@@ -26,7 +26,7 @@ const LoginForm: React.FC = () => {
   // триггер фетч юзер даты не при рендере, а после логина за счёт установки параметра skip
   const [skip, setSkip] = useState<boolean>(true);
   const { data: profile, isLoading: isLoadingProfile } = useGetProfileQuery(
-    undefined,
+    null,
     {
       skip,
     }
