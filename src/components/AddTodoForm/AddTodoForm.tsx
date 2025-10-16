@@ -1,30 +1,22 @@
-import { memo, useState } from 'react';
-import { addTodoApi } from '../../api/apiTodos';
+import { useState } from 'react';
 import { Alert, Button, Form, Input, type FormProps } from 'antd';
+import { useAddTodoMutation } from '../../store/Todos/api';
 
-interface AddTodoFormProps {
-  fetchTodos: () => void;
-}
-
-const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
+const AddTodoForm = () => {
   const [errorText, setErrorText] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
+
+  const [addTodo, { isLoading: isAddingTodo }] = useAddTodoMutation();
 
   const onSubmit: FormProps<{ title: string }>['onFinish'] = async (values) => {
     const todoTitle = values.title;
 
-    setErrorText('');
-    setIsLoading(true);
     try {
-      await addTodoApi(todoTitle);
-      fetchTodos();
+      await addTodo(todoTitle);
       form.resetFields();
     } catch (error) {
       console.error('Error:', error);
       setErrorText('Ошибка при добавлении задачи.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -52,7 +44,7 @@ const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
           <Input placeholder='Введите текст задачи...' />
         </Form.Item>
         <Form.Item>
-          <Button type='primary' htmlType='submit' disabled={isLoading}>
+          <Button type='primary' htmlType='submit' disabled={isAddingTodo}>
             Создать
           </Button>
         </Form.Item>
@@ -60,6 +52,6 @@ const AddTodoForm = memo(({ fetchTodos }: AddTodoFormProps) => {
       {errorText && <Alert message={errorText} type='error' showIcon />}
     </>
   );
-});
+};
 
 export default AddTodoForm;

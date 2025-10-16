@@ -1,11 +1,18 @@
-import { Layout, Menu, theme, type MenuProps } from 'antd';
-
-import { Outlet, useLocation, useNavigate } from 'react-router';
+import { Button, Layout, Menu, theme, type MenuProps } from 'antd';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useLogoutUserMutation } from '../store/Auth/api';
+import { setIsAuthorized } from '../store/Auth/auth.slice';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  clearUserProfile,
+  selectUserHasRequiredRole,
+} from '../store/User/user.slice';
+import { useGetProfileQuery, userApi } from '../store/User/api';
 const { Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-const items: MenuItem[] = [
+const menuItems: MenuItem[] = [
   {
     key: '/todos',
     label: 'Список задач',
@@ -13,6 +20,21 @@ const items: MenuItem[] = [
   {
     key: '/profile',
     label: 'Профиль',
+  },
+];
+
+const menuItemsForAdminOrModerator: MenuItem[] = [
+  {
+    key: '/todos',
+    label: 'Список задач',
+  },
+  {
+    key: '/profile',
+    label: 'Профиль',
+  },
+  {
+    key: '/users',
+    label: 'Пользователи',
   },
 ];
 
@@ -30,33 +52,75 @@ const siderStyle: React.CSSProperties = {
 const HomePageLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [logoutUser, { isLoading: isLoggingOutUser }] = useLogoutUserMutation();
+
+  useGetProfileQuery(null, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const hasRole = useSelector(selectUserHasRequiredRole);
+  const isAdminOrModerator = hasRole(['ADMIN', 'MODERATOR']);
 
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const onClick: MenuProps['onClick'] = (e) => {
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
     navigate(e.key);
+  };
+
+  const handleLogoutClick = () => {
+    logoutUser();
+    dispatch(setIsAuthorized({ isAuthorized: false }));
+    dispatch(clearUserProfile());
+    dispatch(userApi.util.invalidateTags(['UserProfile']));
+    navigate('/auth/login', { replace: true });
   };
 
   return (
     <Layout>
-      <Sider style={siderStyle} breakpoint="lg" collapsedWidth="0">
-        <div className="demo-logo-vertical" />
-        <Menu
+      <Sider style={siderStyle} breakpoint='sm' collapsedWidth='0'>
+        {/* антд оборачивает контент сайдера в див, поэтому не получается задать justifyContent: 'space-between' сайдеру напрямую, поэтому обернул меню и кнопку логаута в див с флексом, чтобы отнести кнопку логаута вниз */}
+        <div
           style={{
-            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            justifyContent: 'space-between',
           }}
-          theme="dark"
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={items}
-          onSelect={onClick}
-        />
+        >
+          <Menu
+            style={{
+              padding: 24,
+            }}
+            theme='dark'
+            mode='inline'
+            selectedKeys={[location.pathname]}
+            items={
+              isAdminOrModerator ? menuItemsForAdminOrModerator : menuItems
+            }
+            onSelect={handleMenuClick}
+            inlineIndent={16}
+          />
+
+          <Button
+            onClick={handleLogoutClick}
+            disabled={isLoggingOutUser}
+            style={{
+              width: '125px',
+              display: 'block',
+              margin: '24px auto',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+            }}
+          >
+            Выйти
+          </Button>
+        </div>
       </Sider>
       <Layout>
-        {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
-        <Content style={{ margin: '24px 16px 0' }}>
+        <Content>
           <div
             style={{
               padding: 24,
@@ -68,7 +132,6 @@ const HomePageLayout = () => {
             <Outlet />
           </div>
         </Content>
-        {/* <Footer style={{ textAlign: 'center' }}></Footer> */}
       </Layout>
     </Layout>
   );
