@@ -1,6 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {
+  createSelector,
+  createSlice,
+  type PayloadAction,
+} from '@reduxjs/toolkit';
 
-import type { Profile } from '../../types/types';
+import type { Profile, Role } from '../../types/types';
 import type { AppState } from '../redux';
 
 type UserState = {
@@ -12,17 +16,33 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: 'filter',
+  name: 'user',
   initialState,
   reducers: {
-    setProfile: (state, action) => {
-      state.userProfile = action.payload.userProfile;
+    setProfile: (state, action: PayloadAction<Profile>) => {
+      state.userProfile = action.payload;
+    },
+    clearUserProfile: (state) => {
+      state.userProfile = null;
     },
   },
 });
 
 export const selectUserProfile = (state: AppState) => state.user.userProfile;
 
-export const { setProfile } = userSlice.actions;
+export const selectUserRoles = (state: AppState) =>
+  state.user.userProfile?.roles;
+
+export const selectUserHasRequiredRole = createSelector(
+  selectUserRoles,
+  (userRoles) => (requiredRoles: Role[]) => {
+    const isRequiredRole = userRoles?.some((role) =>
+      requiredRoles.includes(role)
+    );
+    return isRequiredRole;
+  }
+);
+
+export const { setProfile, clearUserProfile } = userSlice.actions;
 
 export default userSlice.reducer;

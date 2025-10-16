@@ -8,6 +8,7 @@ import {
 import type { Token } from '../types/types';
 import { tokenService } from '../services/tokenService';
 import { setIsAuthorized } from './Auth/auth.slice';
+import { clearUserProfile } from './User/user.slice';
 
 const baseUrl = import.meta.env.VITE_DATABASE_URL;
 
@@ -15,7 +16,6 @@ export const baseQuery = fetchBaseQuery({
   baseUrl,
   prepareHeaders: (headers) => {
     const accessToken = tokenService.getAccessToken()?.accessToken;
-    console.log('Base query');
 
     if (accessToken) {
       headers.set('authorization', `Bearer ${accessToken}`);
@@ -75,10 +75,10 @@ export const baseQueryWithReauth: BaseQueryFn<
       // Пробуем заново изначальный запрос
       result = await baseQuery(args, store, extraOptions);
     } else {
-      console.log('logging out from reauth query');
       tokenService.clearAccessToken();
       localStorage.removeItem('refreshToken');
       store.dispatch(setIsAuthorized({ isAuthorized: false }));
+      store.dispatch(clearUserProfile());
       window.location.href = '/auth/login';
     }
   }
@@ -87,7 +87,7 @@ export const baseQueryWithReauth: BaseQueryFn<
 
 export const baseApi = createApi({
   reducerPath: 'api',
-  tagTypes: ['Todo', 'UserProfile'],
+  tagTypes: ['Todo', 'UserProfile', 'User'],
   baseQuery: baseQueryWithReauth,
   endpoints: () => ({}),
 });

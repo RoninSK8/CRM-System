@@ -2,7 +2,12 @@ import { Button, Layout, Menu, theme, type MenuProps } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useLogoutUserMutation } from '../store/Auth/api';
 import { setIsAuthorized } from '../store/Auth/auth.slice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  clearUserProfile,
+  selectUserHasRequiredRole,
+} from '../store/User/user.slice';
+import { useGetProfileQuery, userApi } from '../store/User/api';
 const { Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -15,6 +20,21 @@ const menuItems: MenuItem[] = [
   {
     key: '/profile',
     label: 'Профиль',
+  },
+];
+
+const menuItemsForAdminOrModerator: MenuItem[] = [
+  {
+    key: '/todos',
+    label: 'Список задач',
+  },
+  {
+    key: '/profile',
+    label: 'Профиль',
+  },
+  {
+    key: '/users',
+    label: 'Пользователи',
   },
 ];
 
@@ -35,6 +55,13 @@ const HomePageLayout = () => {
   const dispatch = useDispatch();
   const [logoutUser, { isLoading: isLoggingOutUser }] = useLogoutUserMutation();
 
+  useGetProfileQuery(null, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const hasRole = useSelector(selectUserHasRequiredRole);
+  const isAdminOrModerator = hasRole(['ADMIN', 'MODERATOR']);
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -46,13 +73,15 @@ const HomePageLayout = () => {
   const handleLogoutClick = () => {
     logoutUser();
     dispatch(setIsAuthorized({ isAuthorized: false }));
+    dispatch(clearUserProfile());
+    dispatch(userApi.util.invalidateTags(['UserProfile']));
     navigate('/auth/login', { replace: true });
   };
 
   return (
     <Layout>
       <Sider style={siderStyle} breakpoint='sm' collapsedWidth='0'>
-        {/* антд оборачивает контент сайдера в див, поэтому не получается задать justifyContent: 'space-between' саайдеру напрямую, поэтому обернул меню и кнопку логаута в див с флексом, чтобы отнести кнопку логаута вниз */}
+        {/* антд оборачивает контент сайдера в див, поэтому не получается задать justifyContent: 'space-between' сайдеру напрямую, поэтому обернул меню и кнопку логаута в див с флексом, чтобы отнести кнопку логаута вниз */}
         <div
           style={{
             display: 'flex',
@@ -68,7 +97,9 @@ const HomePageLayout = () => {
             theme='dark'
             mode='inline'
             selectedKeys={[location.pathname]}
-            items={menuItems}
+            items={
+              isAdminOrModerator ? menuItemsForAdminOrModerator : menuItems
+            }
             onSelect={handleMenuClick}
             inlineIndent={16}
           />
@@ -89,8 +120,7 @@ const HomePageLayout = () => {
         </div>
       </Sider>
       <Layout>
-        {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
-        <Content style={{ margin: '24px 16px 0' }}>
+        <Content>
           <div
             style={{
               padding: 24,
@@ -102,7 +132,6 @@ const HomePageLayout = () => {
             <Outlet />
           </div>
         </Content>
-        {/* <Footer style={{ textAlign: 'center' }}></Footer> */}
       </Layout>
     </Layout>
   );
